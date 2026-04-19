@@ -3131,12 +3131,41 @@
             tryNextApi();
         }
 
-        function downloadScreenshot() {
+        async function downloadScreenshot() {
             const img = document.getElementById('screenshotImg');
-            const link = document.createElement('a');
-            link.download = 'screenshot_' + Date.now() + '.png';
-            link.href = img.src;
-            link.click();
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            if (!img.src || img.style.display === 'none') {
+                alert('请先截图再下载');
+                return;
+            }
+
+            btn.innerHTML = '⏳ 下载中...';
+            btn.disabled = true;
+
+            try {
+                // 使用 fetch 获取图片并转为 Blob
+                const response = await fetch(img.src);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                
+                const link = document.createElement('a');
+                link.download = 'screenshot_' + Date.now() + '.png';
+                link.href = blobUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                // 释放内存
+                setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+            } catch (e) {
+                // 跨域失败时，提示用户右键另存
+                alert('浏览器安全限制，请右键点击图片选择"另存为..."');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
         }
 
         // 系统信息查看
