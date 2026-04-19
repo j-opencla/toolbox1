@@ -2527,6 +2527,10 @@
         // JSON Formatter
         function formatJson() {
             const input = document.getElementById('jsonInput').value;
+            if (!input.trim()) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入JSON内容</span>';
+                return;
+            }
             if (input.length > 1000000) {
                 document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大，请限制在1MB以内</span>';
                 return;
@@ -2535,12 +2539,25 @@
                 const json = JSON.parse(input);
                 document.getElementById('jsonResult').textContent = JSON.stringify(json, null, 2);
             } catch (e) {
-                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
+                const msg = e.message;
+                let hint = '';
+                if (msg.includes('Unexpected token')) {
+                    hint = ' → 检查是否有多余的逗号、缺少引号或括号不匹配';
+                } else if (msg.includes('Unexpected end')) {
+                    hint = ' → JSON不完整，检查是否缺少闭合的括号或引号';
+                } else if (msg.includes('Expecting')) {
+                    hint = ' → 格式不符合JSON规范，键名需要双引号';
+                }
+                document.getElementById('jsonResult').innerHTML = `<span style="color: #ff6b6b;">❌ JSON格式错误: ${msg}${hint}</span>`;
             }
         }
 
         function compressJson() {
             const input = document.getElementById('jsonInput').value;
+            if (!input.trim()) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入JSON内容</span>';
+                return;
+            }
             if (input.length > 1000000) {
                 document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大，请限制在1MB以内</span>';
                 return;
@@ -2549,16 +2566,39 @@
                 const json = JSON.parse(input);
                 document.getElementById('jsonResult').textContent = JSON.stringify(json);
             } catch (e) {
-                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
+                const msg = e.message;
+                let hint = '';
+                if (msg.includes('Unexpected token')) {
+                    hint = ' → 检查是否有多余的逗号、缺少引号或括号不匹配';
+                } else if (msg.includes('Unexpected end')) {
+                    hint = ' → JSON不完整，检查是否缺少闭合的括号或引号';
+                } else if (msg.includes('Expecting')) {
+                    hint = ' → 格式不符合JSON规范，键名需要双引号';
+                }
+                document.getElementById('jsonResult').innerHTML = `<span style="color: #ff6b6b;">❌ JSON格式错误: ${msg}${hint}</span>`;
             }
         }
 
         function validateJson() {
+            const input = document.getElementById('jsonInput').value;
+            if (!input.trim()) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入JSON内容</span>';
+                return;
+            }
             try {
-                JSON.parse(document.getElementById('jsonInput').value);
+                JSON.parse(input);
                 document.getElementById('jsonResult').innerHTML = '<span style="color: #00ff88;">✅ JSON格式有效！</span>';
             } catch (e) {
-                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
+                const msg = e.message;
+                let hint = '';
+                if (msg.includes('Unexpected token')) {
+                    hint = ' → 检查是否有多余的逗号、缺少引号或括号不匹配';
+                } else if (msg.includes('Unexpected end')) {
+                    hint = ' → JSON不完整，检查是否缺少闭合的括号或引号';
+                } else if (msg.includes('Expecting')) {
+                    hint = ' → 格式不符合JSON规范，键名需要双引号';
+                }
+                document.getElementById('jsonResult').innerHTML = `<span style="color: #ff6b6b;">❌ JSON格式错误: ${msg}${hint}</span>`;
             }
         }
 
@@ -2566,6 +2606,10 @@
         function testRegex() {
             const pattern = document.getElementById('regexPattern').value;
             const text = document.getElementById('regexText').value;
+            if (!pattern.trim()) {
+                document.getElementById('regexResult').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入正则表达式</span>';
+                return;
+            }
             const flags = (document.getElementById('regexGlobal').checked ? 'g' : '') + 
                         (document.getElementById('regexCase').checked ? 'i' : '');
             try {
@@ -2579,14 +2623,36 @@
                     document.getElementById('regexResult').innerHTML = '<span style="color: #ffd700;">未找到匹配</span>';
                 }
             } catch (e) {
-                document.getElementById('regexResult').innerHTML = '<span style="color: #ff6b6b;">❌ 正则表达式错误: ' + e.message + '</span>';
+                const msg = e.message;
+                let hint = '';
+                if (msg.includes('Unterminated')) {
+                    hint = ' → 检查是否缺少闭合的括号、方括号或大括号';
+                } else if (msg.includes('Invalid quantifier')) {
+                    hint = ' → 量词格式错误，正确格式如 a* a+ a? a{2} a{2,5}';
+                } else if (msg.includes('Nothing to repeat')) {
+                    hint = ' → 量词前需要有字符，如 \\d+ 而不是 +';
+                } else if (msg.includes('Invalid escape')) {
+                    hint = ' → 转义字符错误，常用：\\d \\w \\s \\. \\* \\?';
+                }
+                document.getElementById('regexResult').innerHTML = `<span style="color: #ff6b6b;">❌ 正则表达式错误: ${msg}${hint}</span>`;
             }
         }
 
         // Color Picker
         function hexToAll() {
-            let hex = document.getElementById('hexInput').value;
+            let hex = document.getElementById('hexInput').value.trim();
+            if (!hex) return;
             if (!hex.startsWith('#')) hex = '#' + hex;
+            // 验证HEX格式：#RGB 或 #RRGGBB
+            if (!/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/.test(hex)) {
+                document.getElementById('rgbInput').value = '格式错误';
+                document.getElementById('hslInput').value = '请输入有效的HEX颜色（如 #FF5733 或 #F53）';
+                return;
+            }
+            // 扩展3位HEX为6位
+            if (hex.length === 4) {
+                hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
+            }
             document.getElementById('colorPicker').value = hex;
             document.getElementById('colorDisplay').style.background = hex;
             document.getElementById('colorDisplay').textContent = hex;
@@ -2661,8 +2727,18 @@
                 const text = document.getElementById('base64Input').value;
                 document.getElementById('base64Result').textContent = decodeURIComponent(escape(atob(text)));
             } catch (e) {
-                document.getElementById('base64Result').innerHTML = '<span style="color: #ff6b6b;">❌ Base64解码错误</span>';
-            }
+                const input = document.getElementById('base64Input').value.trim();
+                let hint = '';
+                if (!input) {
+                    hint = '请先输入要解码的内容';
+                } else if (!/^[A-Za-z0-9+/=]+$/.test(input.replace(/\s/g, ''))) {
+                    hint = '包含无效字符（Base64只允许A-Z、a-z、0-9、+、/、=）';
+                } else if (input.length % 4 !== 0) {
+                    hint = '长度不正确（Base64字符串长度必须是4的倍数）';
+                } else {
+                    hint = '请检查输入是否为有效的Base64编码';
+                }
+                document.getElementById('base64Result').innerHTML = `<span style="color: #ff6b6b;">❌ 解码失败：${hint}</span>`;
         }
 
         // URL Encode
@@ -2676,8 +2752,16 @@
                 const text = document.getElementById('urlInput').value;
                 document.getElementById('urlResult').textContent = decodeURIComponent(text);
             } catch (e) {
-                document.getElementById('urlResult').innerHTML = '<span style="color: #ff6b6b;">❌ URL解码错误</span>';
-            }
+                const input = document.getElementById('urlInput').value.trim();
+                let hint = '';
+                if (!input) {
+                    hint = '请先输入要解码的内容';
+                } else if (input.includes('%') && !/%[0-9A-Fa-f]{2}/.test(input)) {
+                    hint = '百分号后需要跟两位十六进制数（如 %20 表示空格）';
+                } else {
+                    hint = '请检查是否包含不完整的编码序列';
+                }
+                document.getElementById('urlResult').innerHTML = `<span style="color: #ff6b6b;">❌ 解码失败：${hint}</span>`;
         }
 
         // Timestamp
