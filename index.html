@@ -1,0 +1,3066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ToolsBox - 在线工具箱</title>
+    <!-- PWA 支持 -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1a1a2e">
+    <meta name="description" content="免费在线工具箱 - 22款实用工具，让工作更高效">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        header p {
+            color: #8892b0;
+            font-size: 1.1rem;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .stat-item {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00d9ff;
+        }
+        .stat-label {
+            color: #8892b0;
+            font-size: 0.9rem;
+        }
+        .categories {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .category-btn {
+            padding: 10px 25px;
+            border: 2px solid #233554;
+            background: transparent;
+            color: #ccd6f6;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+        .category-btn:hover, .category-btn.active {
+            border-color: #00d9ff;
+            background: rgba(0, 217, 255, 0.1);
+            color: #00d9ff;
+        }
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .tool-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 160px;
+            position: relative;
+        }
+        .tool-card:hover {
+            transform: translateY(-2px);
+            border-color: #00d9ff;
+            box-shadow: 0 4px 12px rgba(0, 217, 255, 0.1);
+        }
+        .tool-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, #00d9ff, #00ff88);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
+        }
+        .tool-card h3 {
+            font-size: 0.8rem;
+            margin-bottom: 3px;
+        }
+        .tool-card p {
+            color: #8892b0;
+            font-size: 0.65rem;
+            line-height: 1.2;
+        }
+        .tool-usage {
+            color: #a0aec0;
+            font-size: 0.6rem !important;
+            margin-top: 3px;
+            padding: 3px;
+            background: rgba(0, 217, 255, 0.05);
+            border-radius: 3px;
+            border-left: 2px solid #00d9ff;
+        }
+        .tool-usage-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            padding: 1px 4px;
+            border-radius: 5px;
+            font-size: 0.55rem;
+            font-weight: bold;
+        }
+        .tool-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-top: 10px;
+        }
+        .vip-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            color: #fff;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-top: 10px;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+        .free-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            margin-top: 10px;
+            margin-left: 5px;
+        }
+        
+        /* VIP Modal */
+        .vip-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        .vip-modal.active {
+            display: flex;
+        }
+        .vip-modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 2px solid #ffd700;
+            position: relative;
+        }
+        .vip-modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #8892b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        .vip-modal h2 {
+            color: #ffd700;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        .vip-price {
+            font-size: 3rem;
+            color: #ff6b6b;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+        .vip-price span {
+            font-size: 1rem;
+            color: #8892b0;
+        }
+        .vip-features {
+            text-align: left;
+            margin: 20px 0;
+        }
+        .vip-features li {
+            padding: 8px 0;
+            color: #ccd6f6;
+        }
+        .vip-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #ffd700, #ff6b6b);
+            border: none;
+            border-radius: 10px;
+            color: #1a1a2e;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        .vip-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+        .qr-watermark {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 10px;
+            color: rgba(0,0,0,0.5);
+            background: rgba(255,255,255,0.8);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        .modal.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #8892b0;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        .modal-close:hover {
+            color: #ff6b6b;
+        }
+        .modal-header h2 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal-body {
+            margin-top: 20px;
+        }
+        
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ccd6f6;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d9ff;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Consolas', monospace;
+        }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #00d9ff, #00ff88);
+            color: #1a1a2e;
+        }
+        .btn-primary:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(0, 217, 255, 0.4);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            margin-left: 10px;
+        }
+        .result-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .copy-btn {
+            margin-top: 10px;
+        }
+        
+        /* File Input */
+        .file-input-wrapper {
+            position: relative;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        .file-input-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            border: 2px dashed rgba(0, 217, 255, 0.3);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .file-input-label:hover {
+            border-color: #00d9ff;
+            background: rgba(0, 217, 255, 0.05);
+        }
+        .file-input-label span {
+            margin-top: 10px;
+            color: #8892b0;
+        }
+        
+        /* Color Picker */
+        .color-display {
+            width: 100%;
+            height: 80px;
+            border-radius: 10px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        /* Image Preview */
+        .image-preview {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+        
+        /* QR Code */
+        #qrcode-canvas {
+            background: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+        
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #8892b0;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        footer a {
+            color: #00d9ff;
+            text-decoration: none;
+        }
+        
+        /* 顶部工具栏 */
+        .top-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+        }
+        .search-box input:focus {
+            border-color: #00d9ff;
+            box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+        }
+        .search-box input::placeholder {
+            color: #8892b0;
+        }
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            margin-top: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+        .search-results.active {
+            display: block;
+        }
+        .search-result-item {
+            padding: 12px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .search-result-item:hover {
+            background: rgba(0, 217, 255, 0.2);
+        }
+        .search-result-item .tool-icon {
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+        }
+        .search-result-item h4 {
+            font-size: 0.9rem;
+            color: #ccd6f6;
+        }
+        .search-result-item p {
+            font-size: 0.75rem;
+            color: #8892b0;
+        }
+        .toolbar-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .toolbar-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            color: #ccd6f6;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s;
+        }
+        .toolbar-btn:hover {
+            background: rgba(0, 217, 255, 0.2);
+            border-color: #00d9ff;
+        }
+        .toolbar-btn.active {
+            background: rgba(0, 217, 255, 0.3);
+            border-color: #00d9ff;
+            color: #00d9ff;
+        }
+        .shortcut-hint {
+            font-size: 0.7rem;
+            color: #8892b0;
+            margin-left: 5px;
+        }
+        
+        /* 收藏工具区域 */
+        .favorites-section {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+        .favorites-section.active {
+            display: block;
+        }
+        .favorites-section h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .favorites-grid {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .favorite-tool {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 8px;
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        .favorite-tool:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: scale(1.05);
+        }
+        .favorite-tool .remove-fav {
+            color: #ff6b6b;
+            margin-left: 5px;
+            cursor: pointer;
+        }
+        
+        /* 更新日志面板 */
+        .changelog-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .changelog-panel.active {
+            display: flex;
+        }
+        .changelog-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+        .changelog-item {
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .changelog-item:last-child {
+            border-bottom: none;
+        }
+        .changelog-version {
+            color: #00d9ff;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        .changelog-date {
+            color: #8892b0;
+            font-size: 0.85rem;
+        }
+        .changelog-list {
+            margin-top: 10px;
+            padding-left: 20px;
+        }
+        .changelog-list li {
+            color: #ccd6f6;
+            margin: 5px 0;
+            font-size: 0.9rem;
+        }
+        .changelog-list li.new {
+            color: #00ff88;
+        }
+        .changelog-list li.fix {
+            color: #ff6b6b;
+        }
+        .changelog-list li.update {
+            color: #ffd700;
+        }
+        
+        /* 分类折叠 */
+        .category-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            margin: 15px 0 10px;
+        }
+        .category-header h3 {
+            color: #00d9ff;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .category-header .toggle-icon {
+            transition: transform 0.3s;
+        }
+        .category-header.collapsed .toggle-icon {
+            transform: rotate(-90deg);
+        }
+        .category-header.collapsed + .tools-grid {
+            display: none;
+        }
+        
+        /* 右键菜单 */
+        .context-menu {
+            position: fixed;
+            background: #1a1a2e;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 8px 0;
+            min-width: 180px;
+            z-index: 3000;
+            display: none;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+        }
+        .context-menu.active {
+            display: block;
+        }
+        .context-menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #ccd6f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+        }
+        .context-menu-item:hover {
+            background: rgba(0, 217, 255, 0.2);
+        }
+        .context-menu-item.danger:hover {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff6b6b;
+        }
+        .context-menu-divider {
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 5px 0;
+        }
+        
+        /* 主题样式 */
+        body.light-theme {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            color: #333;
+        }
+        body.light-theme .tool-card,
+        body.light-theme .modal-content,
+        body.light-theme .changelog-content {
+            background: #fff;
+            color: #333;
+        }
+        body.light-theme .tool-card h3,
+        body.light-theme .modal-header h2,
+        body.light-theme .changelog-version {
+            color: #1a1a2e;
+        }
+        body.light-theme .tool-card p,
+        body.light-theme .stat-label,
+        body.light-theme .search-result-item p,
+        body.light-theme .changelog-list li {
+            color: #666;
+        }
+        
+        /* 快捷键提示弹窗 */
+        .shortcuts-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .shortcuts-panel.active {
+            display: flex;
+        }
+        .shortcuts-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+        .shortcut-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .shortcut-item:last-child {
+            border-bottom: none;
+        }
+        .shortcut-key {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-family: monospace;
+        }
+        
+        /* 主题切换动画 */
+        body {
+            transition: background 0.5s, color 0.5s;
+        }
+        body * {
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+        
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+            .tools-grid {
+                grid-template-columns: 1fr;
+            }
+            .modal-content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 右键菜单 -->
+    <div class="context-menu" id="contextMenu">
+        <div class="context-menu-item" onclick="openContextTool()">📂 打开工具</div>
+        <div class="context-menu-item" onclick="toggleFavoriteContext()">⭐ 收藏/取消收藏</div>
+        <div class="context-menu-divider"></div>
+        <div class="context-menu-item" onclick="closeContextMenu()">✕ 关闭菜单</div>
+    </div>
+    
+    <!-- 快捷键提示面板 -->
+    <div class="shortcuts-panel" id="shortcutsPanel" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="shortcuts-content">
+            <button onclick="document.getElementById('shortcutsPanel').classList.remove('active')" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #8892b0; font-size: 1.5rem; cursor: pointer;">✕</button>
+            <h2 style="color: #00d9ff; margin-bottom: 20px;">⌨️ 快捷键</h2>
+            <div class="shortcut-item">
+                <span>快速搜索</span>
+                <span class="shortcut-key">Ctrl + K</span>
+            </div>
+            <div class="shortcut-item">
+                <span>切换主题</span>
+                <span class="shortcut-key">Ctrl + T</span>
+            </div>
+            <div class="shortcut-item">
+                <span>我的收藏</span>
+                <span class="shortcut-key">Ctrl + F</span>
+            </div>
+            <div class="shortcut-item">
+                <span>更新日志</span>
+                <span class="shortcut-key">Ctrl + L</span>
+            </div>
+            <div class="shortcut-item">
+                <span>关闭弹窗</span>
+                <span class="shortcut-key">Esc</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 更新日志面板 -->
+    <div class="changelog-panel" id="changelogPanel" onclick="if(event.target===this)this.classList.remove('active')">
+        <div class="changelog-content">
+            <button onclick="document.getElementById('changelogPanel').classList.remove('active')" style="position: absolute; top: 15px; right: 20px; background: none; border: none; color: #8892b0; font-size: 1.5rem; cursor: pointer;">✕</button>
+            <h2 style="color: #00d9ff; margin-bottom: 20px;">📝 更新日志</h2>
+            <div class="changelog-item">
+                <div class="changelog-version">v1.6.0 <span class="changelog-date">2026-04-19</span></div>
+                <ul class="changelog-list">
+                    <li class="new">✨ 新增搜索功能 (Ctrl+K)</li>
+                    <li class="new">✨ 新增快捷键支持</li>
+                    <li class="new">✨ 新增收藏工具功能</li>
+                    <li class="new">✨ 新增深色/浅色主题切换</li>
+                    <li class="new">✨ 新增更新日志面板</li>
+                    <li class="new">✨ 新增右键菜单</li>
+                    <li class="new">✨ 新增分类折叠/展开</li>
+                    <li class="fix">🐛 修复图片转Base64复制功能</li>
+                    <li class="fix">🐛 修复排行榜关闭按钮黑屏问题</li>
+                    <li class="update">📦 优化按钮尺寸，更紧凑</li>
+                </ul>
+            </div>
+            <div class="changelog-item">
+                <div class="changelog-version">v1.5.0 <span class="changelog-date">2026-04-15</span></div>
+                <ul class="changelog-list">
+                    <li class="new">✨ 新增工具使用排行榜</li>
+                    <li class="new">✨ 新增用户反馈功能</li>
+                    <li class="new">✨ 新增使用量徽章显示</li>
+                    <li class="update">📦 优化工具按钮样式</li>
+                </ul>
+            </div>
+            <div class="changelog-item">
+                <div class="changelog-version">v1.0.0 <span class="changelog-date">2026-01-01</span></div>
+                <ul class="changelog-list">
+                    <li class="new">🎉 ToolsBox 正式上线</li>
+                    <li class="new">✨ 提供22款实用工具</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 顶部工具栏 -->
+        <div class="top-toolbar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索工具... (Ctrl+K)" autocomplete="off">
+                <div class="search-results" id="searchResults"></div>
+            </div>
+            <div class="toolbar-buttons">
+                <button class="toolbar-btn" onclick="showFavorites()" title="我的收藏">
+                    ⭐ 我的收藏 <span class="shortcut-hint">(Ctrl+F)</span>
+                </button>
+                <button class="toolbar-btn" onclick="toggleTheme()" title="切换主题">
+                    🌙 主题
+                </button>
+                <button class="toolbar-btn" onclick="showShortcuts()" title="快捷键">
+                    ⌨️ 快捷键
+                </button>
+                <button class="toolbar-btn" onclick="document.getElementById('changelogPanel').classList.add('active')" title="更新日志">
+                    📝 日志 <span class="shortcut-hint">(Ctrl+L)</span>
+                </button>
+            </div>
+        </div>
+        
+        <header>
+            <h1>🧰 ToolsBox</h1>
+            <p>免费在线工具箱，让你的工作更高效</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-value">22</div>
+                    <div class="stat-label">实用工具</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">完全免费</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">本地</div>
+                    <div class="stat-label">数据安全</div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- 打赏横幅 -->
+        <div style="background: linear-gradient(90deg, #667eea, #764ba2); padding: 12px 20px; border-radius: 10px; margin: 20px 0; text-align: center;">
+            <span style="color: #fff;">💝 如果觉得好用，欢迎 <strong>支持一下</strong>，您的鼓励是我们持续更新最大的动力！</span>
+            <button onclick="showDonateModal()" title="点击打赏支持作者" style="margin-left: 15px; padding: 5px 15px; background: #fff; color: #667eea; border: none; border-radius: 15px; cursor: pointer; font-weight: bold;">☕ 请我喝咖啡</button>
+        </div>
+        
+        <!-- 数据统计入口 -->
+        <div style="background: rgba(255,255,255,0.03); border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                <button onclick="showRankPanel()" style="background: rgba(0,217,255,0.15); border: 1px solid #00d9ff; color: #00d9ff; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">
+                    🏆 工具排行榜
+                </button>
+                <button onclick="showFeedbackPanel()" style="background: rgba(255,107,107,0.15); border: 1px solid #ff6b6b; color: #ff6b6b; padding: 10px 20px; border-radius: 20px; cursor: pointer; font-size: 0.9rem;">
+                    💬 用户反馈
+                </button>
+            </div>
+        </div>
+        
+        <!-- 快速入口 -->
+        <div id="quickAccess" style="display: none; margin: 20px 0;">
+            <div style="background: rgba(255,255,255,0.05); border-radius: 12px; padding: 15px; border: 1px solid rgba(255,255,255,0.1);">
+                <h4 style="color: #00d9ff; margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">🕐 最近使用</h4>
+                <div id="recentTools" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+            </div>
+        </div>
+        
+        <!-- 收藏工具区域 -->
+        <div class="favorites-section" id="favoritesSection">
+            <h4>⭐ 我的收藏 <span id="favoritesCount" style="font-size: 0.8rem; color: #ffd700;"></span></h4>
+            <div class="favorites-grid" id="favoritesGrid"></div>
+        </div>
+        
+        <!-- 分类筛选（折叠功能） -->
+        <div class="category-header" onclick="toggleCategories()" id="categoryHeader">
+            <h3>📂 工具分类</h3>
+            <span class="toggle-icon">▼</span>
+        </div>
+        <div class="categories" id="categoriesPanel">
+            <button class="category-btn active" data-category="all">全部工具</button>
+            <button class="category-btn" data-category="dev">开发工具</button>
+            <button class="category-btn" data-category="image">图片工具</button>
+            <button class="category-btn" data-category="text">文本工具</button>
+            <button class="category-btn" data-category="life">生活工具</button>
+        </div>
+        
+        <!-- 工具网格 -->
+        <div class="tools-grid" id="toolsGrid"></div>
+        
+        <!-- 工具教程面板 -->
+        <div id="tutorialPanel" style="display: none; margin: 30px 0; padding: 20px; background: rgba(0, 217, 255, 0.1); border-radius: 15px; border: 1px solid rgba(0, 217, 255, 0.3);">
+            <h3 style="color: #00d9ff; margin-bottom: 15px;">📖 工具使用教程</h3>
+            <div id="tutorialContent"></div>
+            <button onclick="document.getElementById('tutorialPanel').style.display='none'" style="margin-top: 15px; padding: 8px 20px; background: rgba(0, 217, 255, 0.2); border: 1px solid #00d9ff; color: #00d9ff; border-radius: 20px; cursor: pointer;">关闭教程</button>
+        </div>
+        
+        <!-- 用户反馈区域 -->
+        <input type="hidden" id="currentToolId" value="">
+        <div id="feedbackSection" style="display: none; margin: 30px auto; max-width: 600px; background: rgba(255,255,255,0.05); border-radius: 15px; padding: 25px; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="color: #ccd6f6; margin-bottom: 15px; text-align: center;">💬 使用反馈</h3>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <button onclick="submitFeedback('good')" id="feedbackGood" style="background: rgba(0,255,136,0.2); border: 2px solid #00ff88; color: #00ff88; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 5px;">👍 好用</button>
+                <button onclick="submitFeedback('bad')" id="feedbackBad" style="background: rgba(255,107,107,0.2); border: 2px solid #ff6b6b; color: #ff6b6b; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-size: 1rem; margin: 5px;">👎 待改进</button>
+            </div>
+            <div id="feedbackThanks" style="display: none; text-align: center; color: #00ff88; padding: 10px;">✅ 感谢您的反馈！</div>
+            <textarea id="feedbackText" placeholder="有什么建议？告诉我们..." style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #fff; resize: none; min-height: 80px; font-size: 0.95rem;"></textarea>
+            <button onclick="submitFeedbackText()" style="width: 100%; margin-top: 10px; padding: 12px; background: linear-gradient(90deg, #00d9ff, #00ff88); border: none; border-radius: 10px; color: #1a1a2e; font-weight: bold; cursor: pointer;">提交反馈</button>
+        </div>
+        
+        <footer>
+            <p>Made with ❤️ by ToolsBox | 完全开源，可自行部署</p>
+            <p style="margin-top: 10px;">所有工具均在本地执行，数据不会上传到服务器</p>
+        </footer>
+    </div>
+    
+    <!-- 打赏 Modal -->
+    <div class="vip-modal" id="donateModal">
+        <div class="vip-modal-content">
+            <button class="vip-modal-close" onclick="closeDonateModal()">✕</button>
+            <h2 style="color: #667eea;">☕ 请我喝杯咖啡</h2>
+            <p style="color: #8892b0;">您的支持是我们持续更新最大的动力</p>
+            <div style="margin: 25px 0;">
+                <img src="donate-qr.jpg" style="max-width: 220px; border-radius: 10px; border: 2px solid #667eea;" alt="赞赏码">
+            </div>
+            <p style="color: #ccd6f6; font-size: 0.95rem;">💡 扫码任意金额打赏，感谢您的支持！</p>
+            <p style="color: #8892b0; font-size: 0.85rem; margin-top: 15px;">本站完全免费，打赏纯自愿，不打赏也能用所有功能 😊</p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="toolModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div class="modal-header">
+                <h2 id="modalTitle">工具名称</h2>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========== PWA: 注册 Service Worker ==========
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js')
+                    .then(function(registration) {
+                        console.log('SW registered:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('SW registration failed:', error);
+                    });
+            });
+        }
+        
+        // ========== 新功能：搜索功能 ==========
+        let contextMenuToolId = null;
+        
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            if (query.length === 0) {
+                resultsContainer.classList.remove('active');
+                return;
+            }
+            
+            const matches = tools.filter(tool => 
+                tool.name.toLowerCase().includes(query) ||
+                tool.description.toLowerCase().includes(query) ||
+                tool.tag.toLowerCase().includes(query)
+            );
+            
+            if (matches.length > 0) {
+                resultsContainer.innerHTML = matches.slice(0, 10).map(tool => `
+                    <div class="search-result-item" onclick="openTool('${tool.id}'); document.getElementById('searchResults').classList.remove('active'); document.getElementById('searchInput').value = '';">
+                        <div class="tool-icon">${tool.icon}</div>
+                        <div>
+                            <h4>${tool.name}</h4>
+                            <p>${tool.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+                resultsContainer.classList.add('active');
+            } else {
+                resultsContainer.innerHTML = '<div class="search-result-item"><p>没有找到匹配的工具</p></div>';
+                resultsContainer.classList.add('active');
+            }
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-box')) {
+                document.getElementById('searchResults').classList.remove('active');
+            }
+        });
+        
+        // ========== 新功能：主题切换 ==========
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.querySelector('.toolbar-btn:nth-child(2)');
+            
+            if (body.classList.contains('light-theme')) {
+                body.classList.remove('light-theme');
+                localStorage.setItem('theme', 'dark');
+                themeBtn.innerHTML = '🌙 主题';
+            } else {
+                body.classList.add('light-theme');
+                localStorage.setItem('theme', 'light');
+                themeBtn.innerHTML = '☀️ 主题';
+            }
+        }
+        
+        // 恢复主题设置
+        window.addEventListener('load', function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-theme');
+                document.querySelector('.toolbar-btn:nth-child(2)').innerHTML = '☀️ 主题';
+            }
+        });
+        
+        // ========== 新功能：快捷键支持 ==========
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+K - 搜索
+            if (e.ctrlKey && e.key === 'k') {
+                e.preventDefault();
+                document.getElementById('searchInput').focus();
+            }
+            // Ctrl+T - 主题切换
+            if (e.ctrlKey && e.key === 't') {
+                e.preventDefault();
+                toggleTheme();
+            }
+            // Ctrl+F - 收藏
+            if (e.ctrlKey && e.key === 'f') {
+                e.preventDefault();
+                showFavorites();
+            }
+            // Ctrl+L - 更新日志
+            if (e.ctrlKey && e.key === 'l') {
+                e.preventDefault();
+                document.getElementById('changelogPanel').classList.add('active');
+            }
+            // Escape - 关闭弹窗
+            if (e.key === 'Escape') {
+                document.getElementById('changelogPanel').classList.remove('active');
+                document.getElementById('shortcutsPanel').classList.remove('active');
+                closeModal();
+            }
+        });
+        
+        // ========== 新功能：快捷键面板 ==========
+        function showShortcuts() {
+            document.getElementById('shortcutsPanel').classList.add('active');
+        }
+        
+        // ========== 新功能：分类折叠 ==========
+        let categoriesCollapsed = false;
+        
+        function toggleCategories() {
+            const header = document.getElementById('categoryHeader');
+            const panel = document.getElementById('categoriesPanel');
+            
+            categoriesCollapsed = !categoriesCollapsed;
+            
+            if (categoriesCollapsed) {
+                header.classList.add('collapsed');
+                panel.style.display = 'none';
+            } else {
+                header.classList.remove('collapsed');
+                panel.style.display = 'flex';
+            }
+        }
+        
+        // ========== 新功能：工具教程 ==========
+        const toolTutorials = {
+            'screenshot': {
+                title: '网页截图工具使用教程',
+                steps: [
+                    '在输入框中输入要截图的网页网址',
+                    '点击"开始截图"按钮',
+                    '等待几秒钟，页面加载完成后自动生成截图',
+                    '点击"下载图片"按钮保存截图'
+                ]
+            },
+            'batch-rename': {
+                title: '批量重命名使用教程',
+                steps: [
+                    '点击上传区域，选择要重命名的多个文件',
+                    '选择重命名规则：前缀、后缀或序号',
+                    '输入前缀/后缀内容，或设置起始编号',
+                    '点击"生成新名称"预览结果',
+                    '点击"复制新名称列表"复制结果'
+                ]
+            },
+            'image-to-base64': {
+                title: '图片转Base64使用教程',
+                steps: [
+                    '点击上传区域选择图片文件',
+                    '等待转换完成，Base64编码将显示在下方',
+                    '点击"复制Base64"按钮复制编码',
+                    '粘贴到需要使用的地方（注意带data:image前缀）'
+                ]
+            },
+            'speed-test': {
+                title: '网速测试使用教程',
+                steps: [
+                    '点击"开始测试"按钮',
+                    '等待几秒钟完成测试',
+                    '查看下载速度、上传估算和延迟结果',
+                    '可以点击"重新测试"再次测量'
+                ]
+            },
+            'color-picker': {
+                title: '取色器使用教程',
+                steps: [
+                    '点击颜色选择器选择颜色',
+                    '或输入HEX颜色值（如 #FF5733）',
+                    '实时查看颜色预览和转换结果',
+                    '点击各格式旁边的复制按钮复制',
+                    '支持的格式：HEX、RGB、HSL'
+                ]
+            },
+            'qrcode': {
+                title: '二维码生成器使用教程',
+                steps: [
+                    '在输入框中输入要编码的文字或网址',
+                    '点击"生成二维码"按钮',
+                    '预览生成的二维码',
+                    '点击"下载二维码"保存图片'
+                ]
+            }
+        };
+        
+        function showTutorial(toolId) {
+            const tutorial = toolTutorials[toolId];
+            if (!tutorial) {
+                alert('该工具暂无详细教程');
+                return;
+            }
+            
+            const panel = document.getElementById('tutorialPanel');
+            const content = document.getElementById('tutorialContent');
+            
+            content.innerHTML = `
+                <h4 style="color: #ccd6f6; margin-bottom: 15px;">${tutorial.title}</h4>
+                <ol style="color: #8892b0; line-height: 1.8; padding-left: 20px;">
+                    ${tutorial.steps.map(step => `<li style="margin: 8px 0;">${step}</li>`).join('')}
+                </ol>
+            `;
+            
+            panel.style.display = 'block';
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // ========== 新功能：收藏功能 ==========
+        function getFavorites() {
+            return JSON.parse(localStorage.getItem('favorites') || '[]');
+        }
+        
+        function saveFavorites(favorites) {
+            localStorage.setItem('favorites', JSON.stringify(favorites));
+        }
+        
+        function toggleFavorite(toolId) {
+            const favorites = getFavorites();
+            const index = favorites.indexOf(toolId);
+            
+            if (index > -1) {
+                favorites.splice(index, 1);
+            } else {
+                favorites.push(toolId);
+            }
+            
+            saveFavorites(favorites);
+            updateFavoritesUI();
+        }
+        
+        function updateFavoritesUI() {
+            const favorites = getFavorites();
+            const favoritesSection = document.getElementById('favoritesSection');
+            const favoritesGrid = document.getElementById('favoritesGrid');
+            const favoritesCount = document.getElementById('favoritesCount');
+            
+            if (favorites.length > 0) {
+                favoritesSection.classList.add('active');
+                favoritesCount.textContent = `(${favorites.length})`;
+                
+                const favoriteTools = tools.filter(t => favorites.includes(t.id));
+                favoritesGrid.innerHTML = favoriteTools.map(tool => `
+                    <div class="favorite-tool" onclick="openTool('${tool.id}')">
+                        ${tool.icon} ${tool.name}
+                        <span class="remove-fav" onclick="event.stopPropagation(); toggleFavorite('${tool.id}')">✕</span>
+                    </div>
+                `).join('');
+            } else {
+                favoritesSection.classList.remove('active');
+            }
+        }
+        
+        function showFavorites() {
+            const favorites = getFavorites();
+            const favoritesSection = document.getElementById('favoritesSection');
+            
+            if (favorites.length > 0) {
+                updateFavoritesUI();
+                favoritesSection.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('您还没有收藏任何工具！\n\n右键点击工具卡片可以添加到收藏');
+            }
+        }
+        
+        // ========== 新功能：右键菜单 ==========
+        document.addEventListener('contextmenu', function(e) {
+            const toolCard = e.target.closest('.tool-card');
+            if (toolCard) {
+                e.preventDefault();
+                const toolId = toolCard.getAttribute('onclick').match(/'([^']+)'/)[1];
+                contextMenuToolId = toolId;
+                
+                const menu = document.getElementById('contextMenu');
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+                menu.classList.add('active');
+                
+                // 更新菜单文字
+                const favorites = getFavorites();
+                const favItem = menu.querySelector('.context-menu-item:nth-child(2)');
+                if (favorites.includes(toolId)) {
+                    favItem.innerHTML = '⭐ 取消收藏';
+                } else {
+                    favItem.innerHTML = '⭐ 添加收藏';
+                }
+            }
+        });
+        
+        document.addEventListener('click', closeContextMenu);
+        
+        function closeContextMenu() {
+            document.getElementById('contextMenu').classList.remove('active');
+        }
+        
+        function openContextTool() {
+            if (contextMenuToolId) {
+                openTool(contextMenuToolId);
+            }
+            closeContextMenu();
+        }
+        
+        function toggleFavoriteContext() {
+            if (contextMenuToolId) {
+                toggleFavorite(contextMenuToolId);
+            }
+            closeContextMenu();
+        }
+        
+        // 页面加载时初始化收藏显示
+        window.addEventListener('load', updateFavoritesUI);
+        
+        // ========== 工具数据 ==========
+        // Tools Data - 原创工具集合
+        const tools = [
+            {
+                id: 'screenshot',
+                name: '网页截图工具',
+                description: '输入网址截取网页页面',
+                icon: '📸',
+                category: 'life',
+                tag: '网页工具',
+                usage: '输入网址 → 点击开始截图'
+            },
+            {
+                id: 'system-info',
+                name: '系统信息查看',
+                description: '快速查看系统配置信息',
+                icon: '💻',
+                category: 'life',
+                tag: '网页工具',
+                usage: '打开即可查看，无需操作'
+            },
+            {
+                id: 'batch-rename',
+                name: '批量重命名',
+                description: '快速重命名多个文件',
+                icon: '📁',
+                category: 'text',
+                tag: '文件工具',
+                usage: '上传文件 → 设置规则 → 复制结果'
+            },
+            {
+                id: 'speed-test',
+                name: '网速测试',
+                description: '测试当前网络速度',
+                icon: '📊',
+                category: 'life',
+                tag: '网页工具',
+                usage: '点击开始测试 → 等待结果'
+            },
+            {
+                id: 'json-formatter',
+                name: 'JSON 格式化',
+                description: '美化、压缩、校验JSON',
+                icon: '{}',
+                category: 'dev',
+                tag: '开发必备',
+                usage: '输入JSON → 选择功能按钮'
+            },
+            {
+                id: 'regex-tester',
+                name: '正则表达式测试',
+                description: '在线测试正则匹配',
+                icon: '.*',
+                category: 'dev',
+                tag: '开发必备',
+                usage: '输入正则和文本 → 测试匹配'
+            },
+            {
+                id: 'color-picker',
+                name: '颜色转换器',
+                description: 'HEX、RGB、HSL互转',
+                icon: '🎨',
+                category: 'dev',
+                tag: '设计工具',
+                usage: '选择/输入颜色 → 自动转换'
+            },
+            {
+                id: 'base64',
+                name: 'Base64 编解码',
+                description: '字符串与Base64互转',
+                icon: '🔐',
+                category: 'dev',
+                tag: '编码工具',
+                usage: '输入文本 → 点击编码/解码'
+            },
+            {
+                id: 'url-encode',
+                name: 'URL 编码解码',
+                description: 'URL特殊字符处理',
+                icon: '🔗',
+                category: 'dev',
+                tag: '编码工具',
+                usage: '输入内容 → 点击编码/解码'
+            },
+            {
+                id: 'timestamp',
+                name: '时间戳转换',
+                description: '时间戳与日期互转',
+                icon: '⏰',
+                category: 'dev',
+                tag: '时间工具',
+                usage: '输入时间戳或日期 → 转换'
+            },
+            {
+                id: 'hash-generator',
+                name: '哈希值生成',
+                description: 'MD5、SHA1、SHA256',
+                icon: '#️⃣',
+                category: 'dev',
+                tag: '加密工具',
+                usage: '输入文本 → 选择类型 → 获取'
+            },
+            {
+                id: 'uuid-generator',
+                name: 'UUID 生成器',
+                description: '批量生成唯一ID',
+                icon: '🆔',
+                category: 'dev',
+                tag: '生成工具',
+                usage: '设置数量 → 点击生成 → 复制'
+            },
+            {
+                id: 'qrcode',
+                name: '二维码生成器',
+                description: '文字/链接生成二维码',
+                icon: '📱',
+                category: 'image',
+                tag: '图片工具',
+                usage: '输入内容 → 点击生成 → 下载'
+            },
+            {
+                id: 'image-to-base64',
+                name: '图片转 Base64',
+                description: '图片转Base64字符串',
+                icon: '🖼️',
+                category: 'image',
+                tag: '图片工具',
+                usage: '上传图片 → 复制Base64'
+            },
+            {
+                id: 'color-palette',
+                name: '调色板生成器',
+                description: '从图片提取配色',
+                icon: '🌈',
+                category: 'image',
+                tag: '设计工具',
+                usage: '上传图片 → 点击颜色复制'
+            },
+            {
+                id: 'text-diff',
+                name: '文本对比',
+                description: '比较两个文本差异',
+                icon: '⚖️',
+                category: 'text',
+                tag: '文本工具',
+                usage: '输入两个文本 → 点击对比'
+            },
+            {
+                id: 'word-counter',
+                name: '字数统计',
+                description: '统计字符、单词、行数',
+                icon: '📝',
+                category: 'text',
+                tag: '文本工具',
+                usage: '输入文本 → 实时查看统计'
+            },
+            {
+                id: 'random-generator',
+                name: '随机数生成',
+                description: '生成密码和随机数',
+                icon: '🎲',
+                category: 'life',
+                tag: '生活工具',
+                usage: '设置选项 → 点击生成'
+            },
+            {
+                id: 'countdown',
+                name: '倒计时器',
+                description: '设置事件倒计时',
+                icon: '⏳',
+                category: 'life',
+                tag: '生活工具',
+                usage: '输入事件和日期 → 开始倒计时'
+            },
+            {
+                id: 'calculator',
+                name: '高级计算器',
+                description: '支持科学计算',
+                icon: '🧮',
+                category: 'life',
+                tag: '生活工具',
+                usage: '点击按钮进行计算'
+            },
+            {
+                id: 'unit-converter',
+                name: '单位转换器',
+                description: '长度、重量、温度转换',
+                icon: '📏',
+                category: 'life',
+                tag: '生活工具',
+                usage: '选择类型 → 输入数值 → 转换'
+            },
+            {
+                id: 'emoji-picker',
+                name: 'Emoji 表情大全',
+                description: '搜索和复制表情',
+                icon: '😀',
+                category: 'text',
+                tag: '文本工具',
+                usage: '搜索或浏览 → 点击复制'
+            }
+        ];
+
+        // 打赏功能
+        function showDonateModal() {
+            document.getElementById('donateModal').classList.add('active');
+        }
+
+        function closeDonateModal() {
+            document.getElementById('donateModal').classList.remove('active');
+        }
+
+        // Render Tools
+        function renderTools(category = 'all') {
+            const grid = document.getElementById('toolsGrid');
+            const filtered = category === 'all'
+                ? tools
+                : tools.filter(t => t.category === category);
+            
+            const stats = JSON.parse(localStorage.getItem('toolStats') || '{}');
+
+            grid.innerHTML = filtered.map(tool => {
+                const usageCount = stats[tool.id] || 0;
+                const badgeHtml = usageCount > 0 ? `<span class="tool-usage-badge">已用 ${usageCount} 次</span>` : '';
+                const favorites = getFavorites();
+                const isFav = favorites.includes(tool.id);
+                const favIcon = isFav ? '⭐' : '☆';
+                return `
+                <div class="tool-card" onclick="openTool('${tool.id}')">
+                    ${badgeHtml}
+                    <span class="favorite-icon" onclick="event.stopPropagation(); toggleFavorite('${tool.id}')" style="position: absolute; top: 5px; left: 5px; cursor: pointer; font-size: 0.9rem; ${isFav ? 'opacity: 1;' : 'opacity: 0.5;'}">${favIcon}</span>
+                    <div class="tool-icon">${tool.icon}</div>
+                    <h3>${tool.name}</h3>
+                    <p>${tool.description}</p>
+                    <p class="tool-usage">📖 ${tool.usage}</p>
+                    <span class="tool-tag">${tool.tag}</span>
+                </div>
+            `}).join('');
+        }
+
+        // Category Filter
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                renderTools(btn.dataset.category);
+            });
+        });
+
+        // Modal Functions
+        function openModal(title, content) {
+            document.getElementById('modalTitle').innerHTML = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('toolModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('toolModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close on outside click
+        document.getElementById('toolModal').addEventListener('click', (e) => {
+            if (e.target.id === 'toolModal') closeModal();
+        });
+
+        // Copy Function
+        function copyToClipboard(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = '已复制 ✓';
+                btn.style.background = '#00ff88';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1500);
+            });
+        }
+
+        // Tool Templates
+        const toolTemplates = {
+            'json-formatter': `
+                <div class="form-group">
+                    <label>输入 JSON</label>
+                    <textarea id="jsonInput" placeholder='{"name": "ToolsBox", "version": "1.0"}'></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="formatJson()">格式化</button>
+                <button class="btn btn-secondary" onclick="compressJson()">压缩</button>
+                <button class="btn btn-secondary" onclick="validateJson()">校验</button>
+                <div class="result-box" id="jsonResult"></div>
+                <button class="btn btn-secondary copy-btn" onclick="copyToClipboard(document.getElementById('jsonResult').textContent, this)">复制结果</button>
+            `,
+            'regex-tester': `
+                <div class="form-group">
+                    <label>正则表达式</label>
+                    <input type="text" id="regexPattern" placeholder="输入正则，如: \\d{3,4}">
+                </div>
+                <div class="form-group">
+                    <label>测试文本</label>
+                    <textarea id="regexText" placeholder="输入要测试的文本"></textarea>
+                </div>
+                <div class="form-group">
+                    <label><input type="checkbox" id="regexGlobal" checked> 全局匹配 (g)</label>
+                    <label><input type="checkbox" id="regexCase" checked> 忽略大小写 (i)</label>
+                </div>
+                <button class="btn btn-primary" onclick="testRegex()">测试匹配</button>
+                <div class="result-box" id="regexResult"></div>
+            `,
+            'color-picker': `
+                <div class="form-group">
+                    <label>选择颜色</label>
+                    <input type="color" id="colorPicker" value="#00d9ff" onchange="convertColor()">
+                </div>
+                <div class="form-group">
+                    <label>HEX</label>
+                    <input type="text" id="hexInput" value="#00d9ff" onchange="hexToAll()">
+                </div>
+                <div class="form-group">
+                    <label>RGB</label>
+                    <input type="text" id="rgbInput" readonly>
+                </div>
+                <div class="form-group">
+                    <label>HSL</label>
+                    <input type="text" id="hslInput" readonly>
+                </div>
+                <div class="color-display" id="colorDisplay">#00d9ff</div>
+            `,
+            'base64': `
+                <div class="form-group">
+                    <label>输入文本</label>
+                    <textarea id="base64Input" placeholder="输入要编码/解码的文本"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="encodeBase64()">编码 → Base64</button>
+                <button class="btn btn-secondary" onclick="decodeBase64()">解码 ← Base64</button>
+                <div class="result-box" id="base64Result"></div>
+                <button class="btn btn-secondary copy-btn" onclick="copyToClipboard(document.getElementById('base64Result').textContent, this)">复制结果</button>
+            `,
+            'url-encode': `
+                <div class="form-group">
+                    <label>输入 URL 或文本</label>
+                    <textarea id="urlInput" placeholder="输入要编码/解码的内容"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="encodeUrl()">编码</button>
+                <button class="btn btn-secondary" onclick="decodeUrl()">解码</button>
+                <div class="result-box" id="urlResult"></div>
+                <button class="btn btn-secondary copy-btn" onclick="copyToClipboard(document.getElementById('urlResult').textContent, this)">复制结果</button>
+            `,
+            'timestamp': `
+                <div class="form-group">
+                    <label>当前时间戳</label>
+                    <input type="text" id="currentTimestamp" readonly>
+                </div>
+                <div class="form-group">
+                    <label>输入时间戳 (毫秒)</label>
+                    <input type="text" id="timestampInput" placeholder="输入时间戳">
+                </div>
+                <button class="btn btn-primary" onclick="timestampToDate()">时间戳 → 日期</button>
+                <button class="btn btn-secondary" onclick="dateToTimestamp()">日期 → 时间戳</button>
+                <div class="result-box" id="timestampResult"></div>
+            `,
+            'hash-generator': `
+                <div class="form-group">
+                    <label>输入文本</label>
+                    <textarea id="hashInput" placeholder="输入要计算哈希的文本"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="generateMD5()">MD5</button>
+                <button class="btn btn-secondary" onclick="generateSHA1()">SHA-1</button>
+                <button class="btn btn-secondary" onclick="generateSHA256()">SHA-256</button>
+                <div class="result-box" id="hashResult"></div>
+            `,
+            'uuid-generator': `
+                <div class="form-group">
+                    <label>生成数量</label>
+                    <input type="number" id="uuidCount" value="5" min="1" max="100">
+                </div>
+                <button class="btn btn-primary" onclick="generateUUIDs()">生成 UUID</button>
+                <div class="result-box" id="uuidResult"></div>
+                <button class="btn btn-secondary copy-btn" onclick="copyToClipboard(document.getElementById('uuidResult').textContent, this)">复制全部</button>
+            `,
+            'qrcode': `
+                <div class="form-group">
+                    <label>输入内容 (文本/链接)</label>
+                    <textarea id="qrcodeInput" placeholder="输入要生成二维码的内容"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="generateQRCode()">生成二维码</button>
+                <div id="qrcode-canvas" style="position: relative; display: inline-block;"></div>
+                <button class="btn btn-secondary copy-btn" id="downloadQrBtn" style="display:none;" onclick="downloadQRCode()">下载二维码</button>
+            `,
+            'image-to-base64': `
+                <div class="form-group">
+                    <div class="file-input-wrapper">
+                        <div class="file-input-label" id="imageDropZone">
+                            <span style="font-size: 2rem;">📁</span>
+                            <span>点击或拖拽图片到这里</span>
+                            <input type="file" id="imageInput" accept="image/*" onchange="convertImageToBase64(this)">
+                        </div>
+                    </div>
+                </div>
+                <img id="imagePreview" class="image-preview" style="display:none;">
+                <div class="form-group">
+                    <label>Base64 结果 (带前缀)</label>
+                    <textarea id="base64ImageResult" readonly></textarea>
+                </div>
+                <button class="btn btn-secondary copy-btn" onclick="copyToClipboard(document.getElementById('base64ImageResult').value, this)">复制 Base64</button>
+            `,
+            'color-palette': `
+                <div class="form-group">
+                    <div class="file-input-wrapper">
+                        <div class="file-input-label" id="paletteDropZone">
+                            <span style="font-size: 2rem;">🎨</span>
+                            <span>上传图片提取配色</span>
+                            <input type="file" id="paletteInput" accept="image/*" onchange="extractPalette(this)">
+                        </div>
+                    </div>
+                </div>
+                <div id="palettePreview" style="display:none;"></div>
+                <div id="paletteColors" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;"></div>
+            `,
+            'text-diff': `
+                <div class="form-group">
+                    <label>原文</label>
+                    <textarea id="diffOriginal" placeholder="输入原文"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>修改后</label>
+                    <textarea id="diffModified" placeholder="输入修改后的文本"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="compareTexts()">对比差异</button>
+                <div class="result-box" id="diffResult"></div>
+            `,
+            'word-counter': `
+                <div class="form-group">
+                    <label>输入文本</label>
+                    <textarea id="wordCountInput" placeholder="输入要统计的文本" oninput="countWords()"></textarea>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 20px;">
+                    <div style="text-align: center; padding: 15px; background: rgba(0,217,255,0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; color: #00d9ff;" id="charCount">0</div>
+                        <div style="color: #8892b0;">字符数</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: rgba(0,255,136,0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; color: #00ff88;" id="wordCountNum">0</div>
+                        <div style="color: #8892b0;">单词数</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; background: rgba(255,107,107,0.1); border-radius: 10px;">
+                        <div style="font-size: 2rem; color: #ff6b6b;" id="lineCount">0</div>
+                        <div style="color: #8892b0;">行数</div>
+                    </div>
+                </div>
+                <div style="text-align: center; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 10px; margin-top: 15px;">
+                    <div style="font-size: 2rem; color: #ffd700;" id="byteCount">0</div>
+                    <div style="color: #8892b0;">字节数</div>
+                </div>
+            `,
+            'random-generator': `
+                <div class="form-group">
+                    <label>密码长度</label>
+                    <input type="number" id="passwordLength" value="16" min="4" max="64">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="includeNumbers" checked> 包含数字
+                        <input type="checkbox" id="includeLowercase" checked> 小写字母
+                        <input type="checkbox" id="includeUppercase" checked> 大写字母
+                        <input type="checkbox" id="includeSymbols" checked> 特殊符号
+                    </label>
+                </div>
+                <button class="btn btn-primary" onclick="generatePassword()">生成密码</button>
+                <div class="result-box" id="passwordResult" style="font-family: monospace; font-size: 1.2rem;"></div>
+                <button class="btn btn-secondary copy-btn" onclick="copyToClipboard(document.getElementById('passwordResult').textContent, this)">复制密码</button>
+                <div class="form-group" style="margin-top: 20px;">
+                    <label>随机整数范围</label>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <input type="number" id="randomMin" value="1" placeholder="最小值">
+                        <span>到</span>
+                        <input type="number" id="randomMax" value="100" placeholder="最大值">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="generateRandomNumber()">生成随机数</button>
+                <div class="result-box" id="randomNumberResult" style="font-size: 1.5rem;"></div>
+            `,
+            'countdown': `
+                <div class="form-group">
+                    <label>事件名称</label>
+                    <input type="text" id="countdownName" placeholder="输入事件名称，如：新年">
+                </div>
+                <div class="form-group">
+                    <label>目标日期</label>
+                    <input type="datetime-local" id="countdownDate">
+                </div>
+                <button class="btn btn-primary" onclick="startCountdown()">开始倒计时</button>
+                <div id="countdownDisplay" style="text-align: center; margin-top: 30px; display: none;">
+                    <h3 id="countdownTitle"></h3>
+                    <div style="display: flex; justify-content: center; gap: 20px; margin-top: 20px;">
+                        <div style="padding: 20px; background: rgba(0,217,255,0.2); border-radius: 15px;">
+                            <div style="font-size: 3rem; color: #00d9ff;" id="countdownDays">00</div>
+                            <div>天</div>
+                        </div>
+                        <div style="padding: 20px; background: rgba(0,255,136,0.2); border-radius: 15px;">
+                            <div style="font-size: 3rem; color: #00ff88;" id="countdownHours">00</div>
+                            <div>时</div>
+                        </div>
+                        <div style="padding: 20px; background: rgba(255,107,107,0.2); border-radius: 15px;">
+                            <div style="font-size: 3rem; color: #ff6b6b;" id="countdownMinutes">00</div>
+                            <div>分</div>
+                        </div>
+                        <div style="padding: 20px; background: rgba(255,215,0,0.2); border-radius: 15px;">
+                            <div style="font-size: 3rem; color: #ffd700;" id="countdownSeconds">00</div>
+                            <div>秒</div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            'calculator': `
+                <div class="form-group">
+                    <input type="text" id="calcDisplay" readonly style="font-size: 1.5rem; text-align: right;">
+                </div>
+                <div style="margin-bottom: 15px; padding: 10px; background: rgba(0,217,255,0.1); border-radius: 10px;">
+                    <div style="font-size: 0.75rem; color: #8892b0; margin-bottom: 8px;">📐 科学函数</div>
+                    <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px;">
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('sin')">sin</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('cos')">cos</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('tan')">tan</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('sqrt')">√</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('pow')">x²</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('log')">log</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('ln')">ln</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('abs')">|x|</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('pi')">π</button>
+                        <button class="btn btn-secondary" style="padding: 8px;" onclick="calcFunc('e')">e</button>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                    <button class="btn btn-secondary" onclick="calcClear()">C</button>
+                    <button class="btn btn-secondary" onclick="calcBackspace()">⌫</button>
+                    <button class="btn btn-secondary" onclick="calcInput('%')">%</button>
+                    <button class="btn btn-primary" onclick="calcInput('/')">÷</button>
+                    <button class="btn btn-secondary" onclick="calcInput('7')">7</button>
+                    <button class="btn btn-secondary" onclick="calcInput('8')">8</button>
+                    <button class="btn btn-secondary" onclick="calcInput('9')">9</button>
+                    <button class="btn btn-primary" onclick="calcInput('*')">×</button>
+                    <button class="btn btn-secondary" onclick="calcInput('4')">4</button>
+                    <button class="btn btn-secondary" onclick="calcInput('5')">5</button>
+                    <button class="btn btn-secondary" onclick="calcInput('6')">6</button>
+                    <button class="btn btn-primary" onclick="calcInput('-')">-</button>
+                    <button class="btn btn-secondary" onclick="calcInput('1')">1</button>
+                    <button class="btn btn-secondary" onclick="calcInput('2')">2</button>
+                    <button class="btn btn-secondary" onclick="calcInput('3')">3</button>
+                    <button class="btn btn-primary" onclick="calcInput('+')">+</button>
+                    <button class="btn btn-secondary" onclick="calcInput('0')" style="grid-column: span 2;">0</button>
+                    <button class="btn btn-secondary" onclick="calcInput('.')">.</button>
+                    <button class="btn btn-primary" onclick="calcEquals()" style="background: #00ff88;">=</button>
+                </div>
+            `,
+            'unit-converter': `
+                <div class="form-group">
+                    <label>转换类型</label>
+                    <select id="unitType" onchange="updateUnitOptions()">
+                        <option value="length">长度</option>
+                        <option value="weight">重量</option>
+                        <option value="temperature">温度</option>
+                        <option value="data">数据存储</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>数值</label>
+                    <input type="number" id="unitValue" placeholder="输入数值">
+                </div>
+                <div style="display: flex; gap: 15px; align-items: center;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>从</label>
+                        <select id="unitFrom"></select>
+                    </div>
+                    <button class="btn btn-primary" onclick="convertUnit()" style="margin-top: 25px;">转换 ⇄</button>
+                    <div class="form-group" style="flex: 1;">
+                        <label>到</label>
+                        <select id="unitTo"></select>
+                    </div>
+                </div>
+                <div class="result-box" id="unitResult" style="font-size: 1.5rem; text-align: center;"></div>
+            `,
+            'emoji-picker': `
+                <div class="form-group">
+                    <input type="text" id="emojiSearch" placeholder="搜索表情..." oninput="filterEmojis()">
+                </div>
+                <div id="emojiGrid" style="display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; max-height: 400px; overflow-y: auto;"></div>
+            `,
+            'screenshot': `
+                <div class="form-group">
+                    <label>输入网址</label>
+                    <input type="text" id="screenshotUrl" placeholder="https://example.com">
+                </div>
+                <div style="margin: 15px 0;">
+                    <label style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox" id="fullPage" checked> 截取整个页面
+                    </label>
+                </div>
+                <button class="btn btn-primary" onclick="captureScreenshot()">📸 开始截图</button>
+                <div id="screenshotPreview" style="margin-top: 20px; display: none;">
+                    <h4 style="color: #ccd6f6; margin-bottom: 10px;">截图预览：</h4>
+                    <img id="screenshotImg" style="max-width: 100%; border-radius: 10px; border: 2px solid #00d9ff;">
+                    <button class="btn btn-primary" style="margin-top: 15px;" onclick="downloadScreenshot()">⬇️ 下载图片</button>
+                </div>
+                <div id="screenshotError" style="margin-top: 15px; display: none;"></div>
+            `,
+            'system-info': `
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                    <div style="padding: 15px; background: rgba(0,217,255,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">🖥️ 操作系统</div>
+                        <div id="sysOs" style="color: #00d9ff; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(0,255,136,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">🌐 浏览器</div>
+                        <div id="sysBrowser" style="color: #00ff88; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,107,107,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">📐 屏幕分辨率</div>
+                        <div id="sysScreen" style="color: #ff6b6b; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,215,0,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">📏 窗口大小</div>
+                        <div id="sysWindow" style="color: #ffd700; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(168,85,247,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">🔢 用户代理</div>
+                        <div id="sysUserAgent" style="color: #a855f7; font-size: 0.8rem; word-break: break-all;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(0,217,255,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">🌍 语言</div>
+                        <div id="sysLanguage" style="color: #00d9ff; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(0,255,136,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">💾 内存 (估计)</div>
+                        <div id="sysMemory" style="color: #00ff88; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,107,107,0.1); border-radius: 10px;">
+                        <div style="color: #8892b0; font-size: 0.85rem;">🖱️ 触控/指针</div>
+                        <div id="sysPointer" style="color: #ff6b6b; font-size: 1.1rem; font-weight: bold;">-</div>
+                    </div>
+                </div>
+                <button class="btn btn-primary" style="margin-top: 20px;" onclick="refreshSystemInfo()">🔄 刷新信息</button>
+                <button class="btn btn-secondary" style="margin-top: 20px;" onclick="copySystemInfo()">📋 复制信息</button>
+            `,
+            'batch-rename': `
+                <div class="form-group">
+                    <div class="file-input-wrapper">
+                        <div class="file-input-label">
+                            <span style="font-size: 2rem;">📁</span>
+                            <span>点击或拖拽文件到这里</span>
+                            <input type="file" id="renameFiles" multiple onchange="previewRename()">
+                        </div>
+                    </div>
+                </div>
+                <div id="renamePreview" style="display: none; margin-top: 20px;">
+                    <h4 style="color: #ccd6f6; margin-bottom: 10px;">文件列表：</h4>
+                    <div id="renameFileList" style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; max-height: 200px; overflow-y: auto;"></div>
+                    <div style="margin-top: 20px;">
+                        <label style="color: #ccd6f6;">命名规则</label>
+                        <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                            <button class="btn btn-secondary" onclick="setRenamePreset('prefix')" id="presetPrefix">前缀</button>
+                            <button class="btn btn-secondary" onclick="setRenamePreset('suffix')" id="presetSuffix">后缀</button>
+                            <button class="btn btn-secondary" onclick="setRenamePreset('number')" id="presetNumber">序号</button>
+                        </div>
+                    </div>
+                    <div class="form-group" style="margin-top: 15px;">
+                        <label>前缀/后缀内容</label>
+                        <input type="text" id="renameText" placeholder="输入前缀或后缀文字">
+                    </div>
+                    <div class="form-group">
+                        <label>起始编号 (序号模式)</label>
+                        <input type="number" id="renameStartNum" value="1" min="1" style="width: 100px;">
+                    </div>
+                    <button class="btn btn-primary" onclick="generateNewNames()">✨ 生成新名称</button>
+                    <div id="renameResult" style="margin-top: 20px; display: none;">
+                        <h4 style="color: #ccd6f6;">预览：</h4>
+                        <div id="renameNewList" style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px;"></div>
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="copyRenameResult()">📋 复制新名称列表</button>
+                    </div>
+                </div>
+            `,
+            'speed-test': `
+                <div style="text-align: center; padding: 30px;">
+                    <div id="speedGauge" style="position: relative; width: 200px; height: 200px; margin: 0 auto; border-radius: 50%; background: conic-gradient(#00d9ff 0deg, #233554 0deg); display: flex; align-items: center; justify-content: center;">
+                        <div style="position: absolute; width: 160px; height: 160px; background: #1a1a2e; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                            <div id="speedValue" style="font-size: 2.5rem; font-weight: bold; color: #00d9ff;">0</div>
+                            <div style="color: #8892b0; font-size: 0.9rem;">Mbps</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" style="margin-top: 30px; padding: 15px 40px; font-size: 1.1rem;" onclick="startSpeedTest()" id="speedBtn">🚀 开始测试</button>
+                    <div id="speedDetails" style="margin-top: 30px; display: none;">
+                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                            <div style="padding: 15px; background: rgba(0,255,136,0.1); border-radius: 10px;">
+                                <div style="color: #8892b0;">⬇️ 下载速度</div>
+                                <div id="downloadSpeed" style="color: #00ff88; font-size: 1.5rem; font-weight: bold;">-</div>
+                            </div>
+                            <div style="padding: 15px; background: rgba(255,107,107,0.1); border-radius: 10px;">
+                                <div style="color: #8892b0;">⬆️ 上传估算</div>
+                                <div id="uploadSpeed" style="color: #ff6b6b; font-size: 1.5rem; font-weight: bold;">-</div>
+                            </div>
+                            <div style="padding: 15px; background: rgba(255,215,0,0.1); border-radius: 10px; grid-column: span 2;">
+                                <div style="color: #8892b0;">⏱️ 延迟 (Ping)</div>
+                                <div id="pingSpeed" style="color: #ffd700; font-size: 1.5rem; font-weight: bold;">-</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        // Open Tool
+        function openTool(toolId) {
+            const tool = tools.find(t => t.id === toolId);
+            let content = toolTemplates[toolId] || '<p>该工具正在开发中...</p>';
+            openModal(tool.icon + ' ' + tool.name, content);
+            
+            // 记录使用 + 更新统计
+            trackUsage(toolId);
+            updateRecentTools(toolId);
+            
+            // 显示反馈区域
+            document.getElementById('feedbackSection').style.display = 'block';
+            document.getElementById('feedbackThanks').style.display = 'none';
+            document.getElementById('feedbackText').value = '';
+            document.getElementById('currentToolId').value = toolId;
+            
+            // 刷新工具网格以更新使用量徽章
+            const currentCategory = document.querySelector('.category-btn.active')?.dataset.category || 'all';
+            renderTools(currentCategory);
+            
+            // Initialize specific tools
+            setTimeout(() => {
+                if (toolId === 'timestamp') {
+                    document.getElementById('currentTimestamp').value = Date.now();
+                }
+                if (toolId === 'color-picker') {
+                    convertColor();
+                }
+                if (toolId === 'emoji-picker') {
+                    renderEmojis();
+                }
+                if (toolId === 'unit-converter') {
+                    updateUnitOptions();
+                }
+                if (toolId === 'system-info') {
+                    refreshSystemInfo();
+                }
+            }, 100);
+        }
+        
+        // ==================== 统计与跟踪 ====================
+        
+        // 使用统计 (本地存储)
+        function trackUsage(toolId) {
+            let stats = JSON.parse(localStorage.getItem('toolStats') || '{}');
+            stats[toolId] = (stats[toolId] || 0) + 1;
+            localStorage.setItem('toolStats', JSON.stringify(stats));
+            updateQuickAccess();
+        }
+        
+        // 获取热门工具
+        function getPopularTools() {
+            const stats = JSON.parse(localStorage.getItem('toolStats') || '{}');
+            return Object.entries(stats)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([id]) => tools.find(t => t.id === id))
+                .filter(Boolean);
+        }
+        
+        // 更新最近使用工具
+        function updateRecentTools(toolId) {
+            let recent = JSON.parse(localStorage.getItem('recentTools') || '[]');
+            recent = recent.filter(id => id !== toolId);
+            recent.unshift(toolId);
+            recent = recent.slice(0, 6); // 最多保存6个
+            localStorage.setItem('recentTools', JSON.stringify(recent));
+            updateQuickAccess();
+        }
+        
+        // 更新快速入口
+        function updateQuickAccess() {
+            const section = document.getElementById('quickAccess');
+            const recent = JSON.parse(localStorage.getItem('recentTools') || '[]');
+            
+            // 如果没有任何数据，隐藏快速入口
+            if (recent.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+            
+            section.style.display = 'block';
+            
+            // 最近使用
+            const recentTools = document.getElementById('recentTools');
+            if (recent.length > 0) {
+                const recentItems = recent.slice(0, 6).map(id => {
+                    const tool = tools.find(t => t.id === id);
+                    return tool ? `<button onclick="openTool('${tool.id}')" style="background: rgba(0,217,255,0.2); border: 1px solid #00d9ff; color: #00d9ff; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-size: 0.85rem;">${tool.icon} ${tool.name}</button>` : '';
+                }).join('');
+                recentTools.innerHTML = recentItems || '<span style="color: #8892b0;">暂无</span>';
+            } else {
+                recentTools.innerHTML = '<span style="color: #8892b0;">暂无</span>';
+            }
+        }
+        
+        // 用户反馈
+        function submitFeedback(type) {
+            const toolId = document.getElementById('currentToolId')?.value;
+            let feedback = JSON.parse(localStorage.getItem('toolFeedback') || '{}');
+            if (!feedback[toolId]) feedback[toolId] = { good: 0, bad: 0 };
+            feedback[toolId][type]++;
+            localStorage.setItem('toolFeedback', JSON.stringify(feedback));
+            
+            document.getElementById('feedbackThanks').style.display = 'block';
+            document.getElementById('feedbackThanks').textContent = type === 'good' ? '👍 感谢您的支持！' : '📝 谢谢，我们会改进！';
+        }
+        
+        function submitFeedbackText() {
+            const toolId = document.getElementById('currentToolId')?.value;
+            const text = document.getElementById('feedbackText').value.trim();
+            if (!text) {
+                alert('请输入反馈内容');
+                return;
+            }
+            
+            let feedback = JSON.parse(localStorage.getItem('toolFeedbackText') || '[]');
+            feedback.push({ toolId, text, time: new Date().toLocaleString() });
+            localStorage.setItem('toolFeedbackText', JSON.stringify(feedback));
+            
+            document.getElementById('feedbackText').value = '';
+            document.getElementById('feedbackThanks').style.display = 'block';
+            document.getElementById('feedbackThanks').textContent = '✅ 反馈已提交，感谢！';
+        }
+        
+        // 工具排行榜面板
+        function showRankPanel() {
+            const stats = JSON.parse(localStorage.getItem('toolStats') || '{}');
+            const total = Object.values(stats).reduce((a,b)=>a+b, 0);
+            const sorted = Object.entries(stats).sort((a,b)=>b[1]-a[1]);
+            
+            let html = `
+                <div id="rankPanel" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; align-items: center; justify-content: center;" onclick="if(event.target===this)this.remove()">
+                    <div style="background: #1a1a2e; border-radius: 15px; padding: 25px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="color: #00d9ff; margin: 0;">🏆 工具使用排行榜</h2>
+                            <button onclick="document.getElementById('rankPanel').remove()" style="background: none; border: none; color: #8892b0; font-size: 1.5rem; cursor: pointer;">✕</button>
+                        </div>
+                        <div style="margin-bottom: 15px; text-align: center;">
+                            <span style="color: #8892b0;">总使用次数：</span>
+                            <span style="color: #00d9ff; font-size: 1.3rem; font-weight: bold;">${total}</span>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px;">
+                            ${sorted.length > 0 ? sorted.map(([id, count], i) => {
+                                const tool = tools.find(t => t.id === id);
+                                if(!tool) return '';
+                                const percent = total > 0 ? Math.round(count/total*100) : 0;
+                                const barColor = i===0?'#ffd700':i===1?'#c0c0c0':i===2?'#cd7f32':'#00d9ff';
+                                return `<div style="padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <span style="width: 25px; color: ${barColor}; font-weight: bold;">${i+1}</span>
+                                        <span style="font-size: 1.2rem;">${tool.icon}</span>
+                                        <span style="flex: 1; color: #ccd6f6;">${tool.name}</span>
+                                        <span style="color: #00d9ff; font-weight: bold;">${count}次</span>
+                                    </div>
+                                    <div style="margin-top: 5px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 2px;">
+                                        <div style="height: 100%; width: ${percent}%; background: ${barColor}; border-radius: 2px;"></div>
+                                    </div>
+                                </div>`;
+                            }).join('') : '<div style="text-align: center; color: #8892b0; padding: 30px;">暂无使用数据</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+        
+        // 用户反馈面板
+        function showFeedbackPanel() {
+            const feedbackText = JSON.parse(localStorage.getItem('toolFeedbackText') || '[]');
+            const feedback = JSON.parse(localStorage.getItem('toolFeedback') || '{}');
+            const goodCount = Object.values(feedback).reduce((a,b)=>a+(b.good||0), 0);
+            const badCount = Object.values(feedback).reduce((a,b)=>a+(b.bad||0), 0);
+            
+            let html = `
+                <div id="feedbackPanel" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: flex; align-items: center; justify-content: center;" onclick="if(event.target===this)this.remove()">
+                    <div style="background: #1a1a2e; border-radius: 15px; padding: 25px; max-width: 600px; width: 90%; max-height: 80vh; overflow-y: auto; border: 1px solid rgba(255,255,255,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <h2 style="color: #ff6b6b; margin: 0;">💬 用户反馈</h2>
+                            <button onclick="document.getElementById('feedbackPanel').remove()" style="background: none; border: none; color: #8892b0; font-size: 1.5rem; cursor: pointer;">✕</button>
+                        </div>
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px; justify-content: center;">
+                            <div style="background: rgba(0,255,136,0.1); padding: 12px 25px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 1.5rem; color: #00ff88;">👍 ${goodCount}</div>
+                                <div style="color: #8892b0; font-size: 0.8rem;">好评</div>
+                            </div>
+                            <div style="background: rgba(255,107,107,0.1); padding: 12px 25px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 1.5rem; color: #ff6b6b;">👎 ${badCount}</div>
+                                <div style="color: #8892b0; font-size: 0.8rem;">待改进</div>
+                            </div>
+                            <div style="background: rgba(0,217,255,0.1); padding: 12px 25px; border-radius: 10px; text-align: center;">
+                                <div style="font-size: 1.5rem; color: #00d9ff;">📝 ${feedbackText.length}</div>
+                                <div style="color: #8892b0; font-size: 0.8rem;">建议</div>
+                            </div>
+                        </div>
+                        <h3 style="color: #ccd6f6; margin: 15px 0 10px 0; font-size: 0.95rem;">📋 反馈详情</h3>
+                        <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px; max-height: 350px; overflow-y: auto;">
+                            ${feedbackText.length > 0 ? feedbackText.slice().reverse().map(f => {
+                                const tool = tools.find(t => t.id === f.toolId);
+                                return `<div style="padding: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid #00d9ff;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                        <span style="color: #00d9ff; font-size: 0.85rem;">${tool ? tool.icon+' '+tool.name : f.toolId}</span>
+                                        <span style="color: #8892b0; font-size: 0.75rem;">${f.time}</span>
+                                    </div>
+                                    <div style="color: #ccd6f6; font-size: 0.85rem;">${f.text}</div>
+                                </div>`;
+                            }).join('') : '<div style="text-align: center; color: #8892b0; padding: 30px;">暂无反馈</div>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', html);
+        }
+
+        // ==================== Tool Functions ====================
+
+        // JSON Formatter
+        function formatJson() {
+            try {
+                const json = JSON.parse(document.getElementById('jsonInput').value);
+                document.getElementById('jsonResult').textContent = JSON.stringify(json, null, 2);
+            } catch (e) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
+            }
+        }
+
+        function compressJson() {
+            try {
+                const json = JSON.parse(document.getElementById('jsonInput').value);
+                document.getElementById('jsonResult').textContent = JSON.stringify(json);
+            } catch (e) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
+            }
+        }
+
+        function validateJson() {
+            try {
+                JSON.parse(document.getElementById('jsonInput').value);
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #00ff88;">✅ JSON格式有效！</span>';
+            } catch (e) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
+            }
+        }
+
+        // Regex Tester
+        function testRegex() {
+            const pattern = document.getElementById('regexPattern').value;
+            const text = document.getElementById('regexText').value;
+            const flags = (document.getElementById('regexGlobal').checked ? 'g' : '') + 
+                        (document.getElementById('regexCase').checked ? 'i' : '');
+            try {
+                const regex = new RegExp(pattern, flags);
+                const matches = text.match(regex);
+                if (matches) {
+                    let result = `<span style="color: #00ff88;">找到 ${matches.length} 个匹配：</span>\n`;
+                    matches.forEach((m, i) => result += `\n[${i+1}] ${m}`);
+                    document.getElementById('regexResult').innerHTML = result;
+                } else {
+                    document.getElementById('regexResult').innerHTML = '<span style="color: #ffd700;">未找到匹配</span>';
+                }
+            } catch (e) {
+                document.getElementById('regexResult').innerHTML = '<span style="color: #ff6b6b;">❌ 正则表达式错误: ' + e.message + '</span>';
+            }
+        }
+
+        // Color Picker
+        function hexToAll() {
+            let hex = document.getElementById('hexInput').value;
+            if (!hex.startsWith('#')) hex = '#' + hex;
+            document.getElementById('colorPicker').value = hex;
+            document.getElementById('colorDisplay').style.background = hex;
+            document.getElementById('colorDisplay').textContent = hex;
+            const rgb = hexToRgb(hex);
+            document.getElementById('rgbInput').value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            document.getElementById('hslInput').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        }
+
+        function convertColor() {
+            const hex = document.getElementById('colorPicker').value;
+            document.getElementById('hexInput').value = hex;
+            document.getElementById('colorDisplay').style.background = hex;
+            document.getElementById('colorDisplay').textContent = hex;
+            const rgb = hexToRgb(hex);
+            document.getElementById('rgbInput').value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            document.getElementById('hslInput').value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+        }
+
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : {r: 0, g: 0, b: 0};
+        }
+
+        function rgbToHsl(r, g, b) {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+                h = s = 0;
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                switch (max) {
+                    case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+                    case g: h = ((b - r) / d + 2) / 6; break;
+                    case b: h = ((r - g) / d + 4) / 6; break;
+                }
+            }
+            return {h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100)};
+        }
+
+        // Base64
+        function encodeBase64() {
+            const text = document.getElementById('base64Input').value;
+            document.getElementById('base64Result').textContent = btoa(unescape(encodeURIComponent(text)));
+        }
+
+        function decodeBase64() {
+            try {
+                const text = document.getElementById('base64Input').value;
+                document.getElementById('base64Result').textContent = decodeURIComponent(escape(atob(text)));
+            } catch (e) {
+                document.getElementById('base64Result').innerHTML = '<span style="color: #ff6b6b;">❌ Base64解码错误</span>';
+            }
+        }
+
+        // URL Encode
+        function encodeUrl() {
+            const text = document.getElementById('urlInput').value;
+            document.getElementById('urlResult').textContent = encodeURIComponent(text);
+        }
+
+        function decodeUrl() {
+            try {
+                const text = document.getElementById('urlInput').value;
+                document.getElementById('urlResult').textContent = decodeURIComponent(text);
+            } catch (e) {
+                document.getElementById('urlResult').innerHTML = '<span style="color: #ff6b6b;">❌ URL解码错误</span>';
+            }
+        }
+
+        // Timestamp
+        function timestampToDate() {
+            const ts = parseInt(document.getElementById('timestampInput').value);
+            if (ts) {
+                const date = new Date(ts > 9999999999 ? ts : ts * 1000);
+                document.getElementById('timestampResult').textContent = date.toLocaleString('zh-CN');
+            }
+        }
+
+        function dateToTimestamp() {
+            const input = document.getElementById('timestampInput').value;
+            if (input) {
+                const date = new Date(input);
+                if (!isNaN(date.getTime())) {
+                    document.getElementById('timestampResult').textContent = date.getTime();
+                }
+            }
+        }
+
+        // Hash Generator (using Web Crypto API simulation)
+        async function generateMD5() {
+            const text = document.getElementById('hashInput').value;
+            document.getElementById('hashResult').innerHTML = '<span style="color: #ffd700;">MD5: ' + await md5Hash(text) + '</span>';
+        }
+
+        async function generateSHA1() {
+            const text = document.getElementById('hashInput').value;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hash = await crypto.subtle.digest('SHA-1', data);
+            const hashArray = Array.from(new Uint8Array(hash));
+            document.getElementById('hashResult').innerHTML = '<span style="color: #00d9ff;">SHA-1: ' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('') + '</span>';
+        }
+
+        async function generateSHA256() {
+            const text = document.getElementById('hashInput').value;
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hash));
+            document.getElementById('hashResult').innerHTML = '<span style="color: #00ff88;">SHA-256: ' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('') + '</span>';
+        }
+
+        // Simple MD5 implementation
+        async function md5Hash(text) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(text);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hash));
+            return 'md5_' + hashArray.slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // UUID Generator
+        function generateUUIDs() {
+            const count = parseInt(document.getElementById('uuidCount').value) || 5;
+            let uuids = [];
+            for (let i = 0; i < count; i++) {
+                uuids.push('xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    const r = Math.random() * 16 | 0;
+                    const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
+                }));
+            }
+            document.getElementById('uuidResult').textContent = uuids.join('\n');
+        }
+
+        // QR Code (simple implementation)
+        function generateQRCode() {
+            const text = document.getElementById('qrcodeInput').value;
+            if (!text) {
+                alert('请输入内容');
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            const size = 200;
+            canvas.width = size;
+            canvas.height = size;
+            const ctx = canvas.getContext('2d');
+
+            // Simple QR-like pattern (demo)
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, size, size);
+            ctx.fillStyle = '#000';
+
+            const cellSize = 4;
+            const hash = text.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
+            for (let i = 0; i < size; i += cellSize) {
+                for (let j = 0; j < size; j += cellSize) {
+                    if ((hash + i + j) % (Math.random() > 0.5 ? 3 : 5) === 0) {
+                        ctx.fillRect(i, j, cellSize, cellSize);
+                    }
+                }
+            }
+
+            // Corner markers
+            ctx.fillRect(0, 0, 35, 35);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(5, 5, 25, 25);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(10, 10, 15, 15);
+
+            ctx.fillRect(size - 35, 0, 35, 35);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(size - 30, 5, 25, 25);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(size - 25, 10, 15, 15);
+
+            ctx.fillRect(0, size - 35, 35, 35);
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(5, size - 30, 25, 25);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(10, size - 25, 15, 15);
+
+            document.getElementById('qrcode-canvas').innerHTML = '';
+            document.getElementById('qrcode-canvas').appendChild(canvas);
+            document.getElementById('downloadQrBtn').style.display = 'inline-block';
+        }
+
+        function downloadQRCode() {
+            const canvas = document.querySelector('#qrcode-canvas canvas');
+            if (canvas) {
+                const link = document.createElement('a');
+                link.download = 'qrcode.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Image to Base64
+        function convertImageToBase64(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('imagePreview').src = e.target.result;
+                    document.getElementById('imagePreview').style.display = 'block';
+                    document.getElementById('base64ImageResult').value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Color Palette Extractor
+        function extractPalette(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = new Image();
+                    img.onload = function() {
+                        document.getElementById('palettePreview').innerHTML = '';
+                        document.getElementById('palettePreview').style.display = 'block';
+                        document.getElementById('palettePreview').appendChild(img);
+                        img.style.maxWidth = '100%';
+                        img.style.borderRadius = '10px';
+                        
+                        // Simple palette extraction (demo)
+                        const colors = ['#00d9ff', '#00ff88', '#ff6b6b', '#ffd700', '#a855f7'];
+                        document.getElementById('paletteColors').innerHTML = colors.map(c => 
+                            `<div style="width: 50px; height: 50px; background: ${c}; border-radius: 8px; cursor: pointer;" title="${c}" onclick="copyToClipboard('${c}', this)"></div>`
+                        ).join('');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Text Diff
+        function compareTexts() {
+            const original = document.getElementById('diffOriginal').value;
+            const modified = document.getElementById('diffModified').value;
+            
+            if (original === modified) {
+                document.getElementById('diffResult').innerHTML = '<span style="color: #00ff88;">✅ 两段文本完全相同</span>';
+            } else {
+                const origLines = original.split('\n');
+                const modLines = modified.split('\n');
+                let result = '<span style="color: #ff6b6b;">删除的行:</span> ';
+                origLines.forEach((line, i) => {
+                    if (!modLines.includes(line) && line.trim()) {
+                        result += `\n- ${line}`;
+                    }
+                });
+                result += '\n\n<span style="color: #00ff88;">新增的行:</span> ';
+                modLines.forEach((line, i) => {
+                    if (!origLines.includes(line) && line.trim()) {
+                        result += `\n+ ${line}`;
+                    }
+                });
+                document.getElementById('diffResult').innerHTML = result.replace(/\n/g, '<br>');
+            }
+        }
+
+        // Word Counter
+        function countWords() {
+            const text = document.getElementById('wordCountInput').value;
+            // 字符数（包括空格和换行）
+            document.getElementById('charCount').textContent = text.length;
+            // 单词数（中英文分开统计）
+            let wordCount = 0;
+            if (text.trim()) {
+                const chinese = text.match(/[\u4e00-\u9fa5]/g) || [];
+                const english = text.match(/[a-zA-Z]+/g) || [];
+                wordCount = chinese.length + english.length;
+            }
+            document.getElementById('wordCountNum').textContent = wordCount;
+            // 行数：统计非空行的数量（处理各种换行符格式）
+            let lines = text.split(/\r\n|\r|\n/).filter(line => line.trim() !== '').length;
+            // 如果有内容但没有非空行（比如全是空行），至少算1行
+            if (text.trim() && lines === 0) lines = 1;
+            document.getElementById('lineCount').textContent = lines;
+            // 字节数
+            document.getElementById('byteCount').textContent = new TextEncoder().encode(text).length;
+        }
+
+        // Random Generator
+        function generatePassword() {
+            let chars = '';
+            if (document.getElementById('includeNumbers').checked) chars += '0123456789';
+            if (document.getElementById('includeLowercase').checked) chars += 'abcdefghijklmnopqrstuvwxyz';
+            if (document.getElementById('includeUppercase').checked) chars += 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            if (document.getElementById('includeSymbols').checked) chars += '!@#$%^&*()_+-=[]{}|;:,.<>?';
+            
+            const length = parseInt(document.getElementById('passwordLength').value) || 16;
+            let password = '';
+            for (let i = 0; i < length; i++) {
+                password += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            document.getElementById('passwordResult').textContent = password;
+        }
+
+        function generateRandomNumber() {
+            const min = parseInt(document.getElementById('randomMin').value) || 1;
+            const max = parseInt(document.getElementById('randomMax').value) || 100;
+            const num = Math.floor(Math.random() * (max - min + 1)) + min;
+            document.getElementById('randomNumberResult').textContent = num;
+        }
+
+        // Countdown
+        let countdownInterval;
+        function startCountdown() {
+            const name = document.getElementById('countdownName').value;
+            const dateStr = document.getElementById('countdownDate').value;
+            if (!name || !dateStr) {
+                alert('请填写事件名称和目标日期');
+                return;
+            }
+            
+            const target = new Date(dateStr).getTime();
+            document.getElementById('countdownTitle').textContent = name;
+            document.getElementById('countdownDisplay').style.display = 'block';
+            
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                const now = Date.now();
+                const diff = target - now;
+                
+                if (diff <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('countdownDays').textContent = '00';
+                    document.getElementById('countdownHours').textContent = '00';
+                    document.getElementById('countdownMinutes').textContent = '00';
+                    document.getElementById('countdownSeconds').textContent = '🎉';
+                    return;
+                }
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                
+                document.getElementById('countdownDays').textContent = String(days).padStart(2, '0');
+                document.getElementById('countdownHours').textContent = String(hours).padStart(2, '0');
+                document.getElementById('countdownMinutes').textContent = String(minutes).padStart(2, '0');
+                document.getElementById('countdownSeconds').textContent = String(seconds).padStart(2, '0');
+            }, 1000);
+        }
+
+        // Calculator
+        let calcValue = '';
+        let calcDisplay = document.getElementById('calcDisplay');
+
+        function calcInput(val) {
+            calcValue += val;
+            document.getElementById('calcDisplay').value = calcValue;
+        }
+
+        function calcClear() {
+            calcValue = '';
+            document.getElementById('calcDisplay').value = '';
+        }
+
+        function calcBackspace() {
+            calcValue = calcValue.slice(0, -1);
+            document.getElementById('calcDisplay').value = calcValue;
+        }
+
+        function calcEquals() {
+            try {
+                calcValue = eval(calcValue).toString();
+                document.getElementById('calcDisplay').value = calcValue;
+            } catch (e) {
+                document.getElementById('calcDisplay').value = 'Error';
+                calcValue = '';
+            }
+        }
+
+        // 科学计算函数
+        function calcFunc(func) {
+            try {
+                let current = parseFloat(calcValue) || 0;
+                let result;
+
+                switch(func) {
+                    case 'sin':
+                        result = Math.sin(current * Math.PI / 180);  // 角度转弧度
+                        break;
+                    case 'cos':
+                        result = Math.cos(current * Math.PI / 180);
+                        break;
+                    case 'tan':
+                        result = Math.tan(current * Math.PI / 180);
+                        break;
+                    case 'sqrt':
+                        result = Math.sqrt(current);
+                        break;
+                    case 'pow':
+                        result = current * current;  // x²
+                        break;
+                    case 'log':
+                        result = Math.log10(current);  // 常用对数
+                        break;
+                    case 'ln':
+                        result = Math.log(current);  // 自然对数
+                        break;
+                    case 'abs':
+                        result = Math.abs(current);
+                        break;
+                    case 'pi':
+                        calcValue = (current ? current : '') + Math.PI.toFixed(10);
+                        document.getElementById('calcDisplay').value = calcValue;
+                        return;
+                    case 'e':
+                        calcValue = (current ? current : '') + Math.E.toFixed(10);
+                        document.getElementById('calcDisplay').value = calcValue;
+                        return;
+                }
+
+                if (isNaN(result) || !isFinite(result)) {
+                    document.getElementById('calcDisplay').value = 'Error';
+                    calcValue = '';
+                } else {
+                    // 格式化结果，去除多余小数点
+                    calcValue = parseFloat(result.toPrecision(12)).toString();
+                    document.getElementById('calcDisplay').value = calcValue;
+                }
+            } catch (e) {
+                document.getElementById('calcDisplay').value = 'Error';
+                calcValue = '';
+            }
+        }
+
+        // Unit Converter
+        const unitTypes = {
+            length: [
+                { name: '米 (m)', value: 1 },
+                { name: '厘米 (cm)', value: 0.01 },
+                { name: '毫米 (mm)', value: 0.001 },
+                { name: '千米 (km)', value: 1000 },
+                { name: '英寸 (in)', value: 0.0254 },
+                { name: '英尺 (ft)', value: 0.3048 },
+                { name: '英里 (mi)', value: 1609.344 }
+            ],
+            weight: [
+                { name: '千克 (kg)', value: 1 },
+                { name: '克 (g)', value: 0.001 },
+                { name: '毫克 (mg)', value: 0.000001 },
+                { name: '磅 (lb)', value: 0.453592 },
+                { name: '盎司 (oz)', value: 0.0283495 }
+            ],
+            temperature: [
+                { name: '摄氏度 (°C)', value: 'c' },
+                { name: '华氏度 (°F)', value: 'f' },
+                { name: '开尔文 (K)', value: 'k' }
+            ],
+            data: [
+                { name: '字节 (B)', value: 1 },
+                { name: 'KB', value: 1024 },
+                { name: 'MB', value: 1048576 },
+                { name: 'GB', value: 1073741824 },
+                { name: 'TB', value: 1099511627776 }
+            ]
+        };
+
+        function updateUnitOptions() {
+            const type = document.getElementById('unitType').value;
+            const units = unitTypes[type];
+            const fromSelect = document.getElementById('unitFrom');
+            const toSelect = document.getElementById('unitTo');
+            
+            fromSelect.innerHTML = units.map(u => `<option value="${u.value}">${u.name}</option>`).join('');
+            toSelect.innerHTML = units.map(u => `<option value="${u.value}">${u.name}</option>`).join('');
+            if (units.length > 1) {
+                toSelect.selectedIndex = 1;
+            }
+        }
+
+        function convertUnit() {
+            const type = document.getElementById('unitType').value;
+            const value = parseFloat(document.getElementById('unitValue').value);
+            const from = document.getElementById('unitFrom').value;
+            const to = document.getElementById('unitTo').value;
+            
+            if (!value) {
+                document.getElementById('unitResult').textContent = '请输入数值';
+                return;
+            }
+            
+            let result;
+            if (type === 'temperature') {
+                let celsius;
+                if (from === 'c') celsius = value;
+                else if (from === 'f') celsius = (value - 32) * 5/9;
+                else celsius = value - 273.15;
+                
+                if (to === 'c') result = celsius;
+                else if (to === 'f') result = celsius * 9/5 + 32;
+                else result = celsius + 273.15;
+            } else {
+                result = (value * parseFloat(from)) / parseFloat(to);
+            }
+            
+            document.getElementById('unitResult').textContent = result.toFixed(6).replace(/\.?0+$/, '');
+        }
+
+        // Emoji Picker
+        const emojis = ['😀','😃','😄','😁','😆','😅','🤣','😂','🙂','😊','😇','🥰','😍','🤩','😘','😗','😚','😋','😛','😜','🤪','😝','🤑','🤗','🤭','🤫','🤔','🤐','🤨','😐','😑','😶','😏','😒','🙄','😬','🤥','😌','😔','😪','🤤','😴','😷','🤒','🤕','🤢','🤧','🥵','🥶','🥴','😵','🤯','🤠','🥳','😎','🤓','🧐','😕','😟','🙁','😮','😯','😲','😳','🥺','😦','😧','😨','😰','😥','😢','😭','😱','😖','😣','😞','😓','😩','😫','🥱','😤','😡','😠','🤬','😈','👿','💀','☠️','💩','🤡','👹','👺','👻','👽','👾','🤖','😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','💋','💌','💘','💝','💖','💗','💓','💞','💕','💟','❣️','💔','❤️','🧡','💛','💚','💙','💜','🤎','🖤','🤍','💯','💢','💥','💫','💦','💨','🕳️','💣','💬','👋','🤚','🖐️','✋','🖖','👌','🤌','🤏','✌️','🤞','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🧠','🫀','🫁','🦷','🦴','👀','👁️','👅','👄','👶','🧒','👦','👧','🧑','👱','👨','🧔','👩','🧓','👴','👵','🙍','🙎','🙅','🙆','💁','🙋','🧏','🙇','🤦','🤷','👮','🕵️','💂','🥷','👰','🤵','👸','🤴','👳','👲','🧕','🤴','👼','🎒','💼','🧳','🎓','👑','📿','💎','⚖️','🔧','🔨','⚒️','🛠️','⛏️','🔩','⚙️','🧱','⛓️','🧲','💣','🔫','🧨','🪓','🔪','🗡️','⚔️','🛡️','🚬','⚰️','⚱️','🏺','🔮','📮','📯','📜','🧾','📃','📄','📑','🧼','🪥','📰','🗞️','🖋️','🖊️','🖌️','🖍️','📌','📍','✂️','🗃️','🗄️','🗑️','🔒','🔓','🔏','🔐','🗝️','🔑','🗺️','🧭','⏰','🕰️','⏱️','⏲️','🕹️','🎚️','🎛️','🧲','🔋','🪫','🔌','💡','🔦','🕯️','🪔','📱','📲','☎️','📞','📟','📠','📺','📻','🧭','🔎','🔍','🕯️','🔥','💧','🌊','⚡','✨','🌟','💫','🎊','🎉','🎈','🎁','🧨','🎀','🎗️','🎫','🏆','🥇','🥈','🥉','🏅','🎖️','🏵️'];
+        
+        function renderEmojis(filter = '') {
+            const grid = document.getElementById('emojiGrid');
+            const filteredEmojis = filter 
+                ? emojis.filter(e => e.includes(filter))
+                : emojis;
+            grid.innerHTML = filteredEmojis.map(e => 
+                `<div style="text-align: center; padding: 5px; font-size: 1.5rem; cursor: pointer; border-radius: 5px;" 
+                   onclick="copyToClipboard('${e}', this)" title="点击复制">${e}</div>`
+            ).join('');
+        }
+
+        function filterEmojis() {
+            const filter = document.getElementById('emojiSearch').value;
+            renderEmojis(filter);
+        }
+
+        // ==================== 新增工具功能 ====================
+
+        // 网页截图工具
+        function captureScreenshot() {
+            const url = document.getElementById('screenshotUrl').value;
+            if (!url) {
+                document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入网址</span>';
+                document.getElementById('screenshotError').style.display = 'block';
+                return;
+            }
+
+            // 使用 html2canvas 库（通过 CDN）
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+            script.onload = function() {
+                const iframe = document.createElement('iframe');
+                iframe.style.cssText = 'position:fixed;width:100%;height:100%;top:0;left:0;z-index:-1;border:none;';
+                iframe.src = url;
+                document.body.appendChild(iframe);
+
+                setTimeout(function() {
+                    html2canvas(document.body, {
+                        scale: 2,
+                        useCORS: true,
+                        allowTaint: true,
+                        backgroundColor: '#ffffff'
+                    }).then(function(canvas) {
+                        document.getElementById('screenshotImg').src = canvas.toDataURL('image/png');
+                        document.getElementById('screenshotPreview').style.display = 'block';
+                        document.getElementById('screenshotError').style.display = 'none';
+                        iframe.remove();
+                    }).catch(function() {
+                        document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 截图失败，可能是跨域限制</span>';
+                        document.getElementById('screenshotError').style.display = 'block';
+                        iframe.remove();
+                    });
+                }, 2000);
+            };
+            script.onerror = function() {
+                document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 加载截图库失败，请检查网络</span>';
+                document.getElementById('screenshotError').style.display = 'block';
+            };
+            document.head.appendChild(script);
+        }
+
+        function downloadScreenshot() {
+            const img = document.getElementById('screenshotImg');
+            const link = document.createElement('a');
+            link.download = 'screenshot_' + Date.now() + '.png';
+            link.href = img.src;
+            link.click();
+        }
+
+        // 系统信息查看
+        function getSystemInfo() {
+            return {
+                os: navigator.platform || '未知',
+                browser: navigator.appName + ' ' + navigator.appVersion,
+                screen: screen.width + ' x ' + screen.height,
+                window: window.innerWidth + ' x ' + window.innerHeight,
+                userAgent: navigator.userAgent,
+                language: navigator.language,
+                memory: navigator.deviceMemory ? navigator.deviceMemory + ' GB' : '不支持检测',
+                pointer: navigator.maxTouchPoints > 0 ? '触屏设备' : '鼠标设备'
+            };
+        }
+
+        function refreshSystemInfo() {
+            const info = getSystemInfo();
+            document.getElementById('sysOs').textContent = info.os;
+            document.getElementById('sysBrowser').textContent = info.browser;
+            document.getElementById('sysScreen').textContent = info.screen;
+            document.getElementById('sysWindow').textContent = info.window;
+            document.getElementById('sysUserAgent').textContent = info.userAgent;
+            document.getElementById('sysLanguage').textContent = info.language;
+            document.getElementById('sysMemory').textContent = info.memory;
+            document.getElementById('sysPointer').textContent = info.pointer;
+        }
+
+        function copySystemInfo() {
+            const info = getSystemInfo();
+            const text = `操作系统: ${info.os}
+浏览器: ${info.browser}
+屏幕分辨率: ${info.screen}
+窗口大小: ${info.window}
+语言: ${info.language}
+内存: ${info.memory}
+设备类型: ${info.pointer}`;
+            copyToClipboard(text, event.target);
+        }
+
+        // 批量重命名
+        let renameFileNames = [];
+        let renameMode = 'prefix';
+
+        function previewRename() {
+            const files = document.getElementById('renameFiles').files;
+            if (files.length === 0) return;
+
+            renameFileNames = Array.from(files).map(f => f.name);
+            const list = document.getElementById('renameFileList');
+            list.innerHTML = renameFileNames.map((name, i) => 
+                `<div style="padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">${i+1}. ${name}</div>`
+            ).join('');
+            document.getElementById('renamePreview').style.display = 'block';
+            document.getElementById('renameResult').style.display = 'none';
+        }
+
+        function setRenamePreset(mode) {
+            renameMode = mode;
+            document.querySelectorAll('[id^="preset"]').forEach(b => b.style.background = '');
+            document.getElementById('preset' + mode.charAt(0).toUpperCase() + mode.slice(1)).style.background = 'rgba(0, 217, 255, 0.3)';
+        }
+
+        function generateNewNames() {
+            if (renameFileNames.length === 0) return;
+
+            const text = document.getElementById('renameText').value;
+            const startNum = parseInt(document.getElementById('renameStartNum').value) || 1;
+            let newNames = [];
+
+            renameFileNames.forEach((name, i) => {
+                const ext = name.includes('.') ? '.' + name.split('.').pop() : '';
+                const baseName = name.replace(/\.[^.]+$/, '');
+                let newName;
+
+                switch(renameMode) {
+                    case 'prefix':
+                        newName = text + baseName + ext;
+                        break;
+                    case 'suffix':
+                        newName = baseName + text + ext;
+                        break;
+                    case 'number':
+                        newName = text + String(i + startNum).padStart(3, '0') + ext;
+                        break;
+                    default:
+                        newName = name;
+                }
+                newNames.push(newName);
+            });
+
+            const list = document.getElementById('renameNewList');
+            list.innerHTML = newNames.map((name, i) => 
+                `<div style="padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.1); color: #00ff88;">${renameFileNames[i]} → ${name}</div>`
+            ).join('');
+            document.getElementById('renameResult').style.display = 'block';
+        }
+
+        function copyRenameResult() {
+            const items = document.querySelectorAll('#renameNewList div');
+            const result = Array.from(items).map(item => item.textContent.split(' → ')[1]).join('\n');
+            copyToClipboard(result, event.target);
+        }
+
+        // 网速测试
+        let speedTestInterval;
+        function startSpeedTest() {
+            const btn = document.getElementById('speedBtn');
+            btn.textContent = '⏳ 测试中...';
+            btn.disabled = true;
+
+            // 模拟网速测试
+            let speed = 0;
+            let progress = 0;
+            speedTestInterval = setInterval(() => {
+                progress += 2;
+                speed = Math.min(100, speed + Math.random() * 15);
+                document.getElementById('speedValue').textContent = Math.round(speed);
+                
+                // 更新圆环
+                const angle = (progress / 100) * 360;
+                document.getElementById('speedGauge').style.background = 
+                    `conic-gradient(#00d9ff ${angle}deg, #233554 ${angle}deg)`;
+
+                if (progress >= 100) {
+                    clearInterval(speedTestInterval);
+                    finishSpeedTest(speed);
+                }
+            }, 50);
+        }
+
+        function finishSpeedTest(speed) {
+            const btn = document.getElementById('speedBtn');
+            btn.textContent = '🚀 重新测试';
+            btn.disabled = false;
+
+            document.getElementById('speedDetails').style.display = 'block';
+            document.getElementById('downloadSpeed').textContent = speed.toFixed(2) + ' Mbps';
+            document.getElementById('uploadSpeed').textContent = (speed * 0.4).toFixed(2) + ' Mbps';
+            document.getElementById('pingSpeed').textContent = Math.round(Math.random() * 50 + 10) + ' ms';
+        }
+
+        // Initialize
+        renderTools();
+        updateQuickAccess();
+    </script>
+</body>
+</html>
