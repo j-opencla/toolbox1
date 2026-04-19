@@ -177,17 +177,6 @@
             font-size: 0.75rem;
             margin-top: 10px;
         }
-        .vip-tag {
-            display: inline-block;
-            padding: 3px 10px;
-            background: linear-gradient(90deg, #ffd700, #ff6b6b);
-            color: #fff;
-            border-radius: 10px;
-            font-size: 0.75rem;
-            margin-top: 10px;
-            margin-left: 5px;
-            font-weight: bold;
-        }
         .free-tag {
             display: inline-block;
             padding: 3px 10px;
@@ -1070,7 +1059,7 @@
         <div class="vip-modal-content">
             <button class="vip-modal-close" onclick="closeDonateModal()">✕</button>
             <h2 style="color: #667eea;">☕ 请我喝杯咖啡</h2>
-            <p style="color: #8892b0;">您的支持是我们持续更新最大的动力</p>
+            <p style="color: #8892b0;">觉得好用？您的支持是持续更新的最大动力 ❤️</p>
             <div style="margin: 25px 0;">
                 <img src="donate-qr.jpg" style="max-width: 220px; border-radius: 10px; border: 2px solid #667eea;" alt="赞赏码" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                 <div style="display:none; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 10px; border: 2px dashed #667eea;">
@@ -1078,43 +1067,8 @@
                     <div style="color: #ccd6f6; font-size: 0.9rem;">扫码打赏功能维护中<br>感谢您的支持！</div>
                 </div>
             </div>
-            <p style="color: #ccd6f6; font-size: 0.95rem;">💡 扫码任意金额打赏，感谢您的支持！</p>
-            <p style="color: #8892b0; font-size: 0.85rem; margin-top: 15px;">不打赏也能用大部分功能，VIP 工具每日限用 3 次 😊</p>
-            <button onclick="closeDonateModal(); showVipUnlockModal()" style="margin-top:12px; padding:8px 20px; background:linear-gradient(135deg,#f093fb,#f5576c); border:none; border-radius:20px; color:#fff; cursor:pointer; font-size:0.9rem;">🔑 输入解锁码</button>
-        </div>
-    </div>
-
-    <!-- VIP 解锁弹窗 -->
-    <div class="vip-modal" id="vipUnlockModal">
-        <div class="vip-modal-content" style="max-width:420px;">
-            <button class="vip-modal-close" onclick="closeVipUnlockModal()">✕</button>
-            <h2 style="color:#f093fb;">🔓 VIP 全站解锁</h2>
-            <p style="color:#8892b0; font-size:0.9rem;">打赏任意金额后，联系站长获取解锁码，永久解锁所有 VIP 工具</p>
-            <div style="margin:20px 0;">
-                <img src="donate-qr.jpg" style="max-width:180px; border-radius:10px; border:2px solid #f093fb;" alt="打赏码">
-                <p style="color:#ccd6f6; font-size:0.85rem; margin-top:8px;">📱 微信/支付宝扫码打赏</p>
-            </div>
-            <p style="color:#ffd700; font-size:0.85rem;">✨ 打赏后联系客服获取解锁码</p>
-            <div style="margin-top:15px;">
-                <input type="text" id="vipUnlockCode" placeholder="在此输入解锁码..." style="width:100%; padding:12px 15px; border-radius:10px; border:1px solid #334; background:#1a1a2e; color:#fff; font-size:1rem; box-sizing:border-box;">
-                <button onclick="tryUnlockVip()" style="margin-top:10px; width:100%; padding:12px; background:linear-gradient(135deg,#f093fb,#f5576c); border:none; border-radius:10px; color:#fff; font-size:1rem; cursor:pointer; font-weight:bold;">解锁 VIP</button>
-                <p id="vipUnlockError" style="color:#ff6b6b; font-size:0.85rem; margin-top:8px; display:none;"></p>
-                <p id="vipUnlockSuccess" style="color:#51cf66; font-size:0.85rem; margin-top:8px; display:none;"></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- VIP 每日限制提示弹窗 -->
-    <div class="vip-modal" id="vipLimitModal">
-        <div class="vip-modal-content" style="max-width:380px;">
-            <button class="vip-modal-close" onclick="closeVipLimitModal()">✕</button>
-            <h2 style="color:#ffd700;">⭐ VIP 工具</h2>
-            <p style="color:#ccd6f6; font-size:1rem; margin:15px 0;">今日免费次数已用完（3/3）</p>
-            <p style="color:#8892b0; font-size:0.9rem;">打赏任意金额即可永久解锁所有 VIP 工具</p>
-            <div style="margin:20px 0;">
-                <img src="donate-qr.jpg" style="max-width:160px; border-radius:10px; border:2px solid #ffd700;" alt="打赏码">
-            </div>
-            <button onclick="closeVipLimitModal(); showVipUnlockModal()" style="padding:12px 25px; background:linear-gradient(135deg,#f093fb,#f5576c); border:none; border-radius:25px; color:#fff; font-size:1rem; cursor:pointer;">☕ 打赏解锁 VIP</button>
+            <p style="color: #51cf66; font-size: 0.95rem;">✨ 所有工具完全免费，打赏全凭自愿！</p>
+            <p style="color: #8892b0; font-size: 0.85rem; margin-top: 15px;">22款工具，浏览器端运行，数据安全 😊</p>
         </div>
     </div>
 
@@ -1622,7 +1576,7 @@
                 category: 'life',
                 tag: '网页工具',
                 usage: '输入网址 → 点击开始截图',
-                type: 'vip'
+                type: 'free'
             },
             {
                 id: 'system-info',
@@ -1637,12 +1591,12 @@
             {
                 id: 'batch-rename',
                 name: '批量重命名',
-                description: '快速重命名多个文件',
+                description: '为文件批量添加前缀、后缀或序号重命名',
                 icon: '📁',
                 category: 'text',
                 tag: '文件工具',
-                description: '为文件批量添加前缀、后缀或序号重命名',
-                type: 'vip'
+                usage: '上传文件 → 设置规则 → 复制结果',
+                type: 'free'
             },
             {
                 id: 'speed-test',
@@ -1762,7 +1716,7 @@
                 category: 'image',
                 tag: '设计工具',
                 usage: '上传图片 → 点击颜色复制',
-                type: 'vip'
+                type: 'free'
             },
             {
                 id: 'text-diff',
@@ -1860,11 +1814,7 @@
                 const favorites = getFavorites();
                 const isFav = favorites.includes(tool.id);
                 const favIcon = isFav ? '⭐' : '☆';
-                const typeTag = tool.type === 'vip'
-                    ? (isVipUnlocked()
-                        ? `<span class="vip-tag" style="background:linear-gradient(135deg,#51cf66,#20c997);">🔓 VIP 已解锁</span>`
-                        : `<span class="vip-tag">⭐ VIP</span>`)
-                    : `<span class="free-tag">免费</span>`;
+                const typeTag = `<span class="free-tag">免费</span>`;
                 return `
                 <div class="tool-card" onclick="openTool('${tool.id}')">
                     ${badgeHtml}
@@ -2355,96 +2305,11 @@
         };
 
         // Open Tool
-        // ========== VIP 功能 ==========
-        const VIP_CODE = 'TOOLSBOX2024';          // 解锁码（可随时修改）
-        const VIP_DAILY_LIMIT = 3;                // 每日免费 VIP 次数
-
-        function isVipUnlocked() {
-            return localStorage.getItem('vipUnlocked') === 'true';
-        }
-
-        function getTodayDate() {
-            return new Date().toDateString();
-        }
-
-        function getVipUsageToday() {
-            const stored = localStorage.getItem('vipUsage') || '{}';
-            const usage = JSON.parse(stored);
-            const today = getTodayDate();
-            if (usage.date !== today) return 0;
-            return usage.count || 0;
-        }
-
-        function incrementVipUsage() {
-            const today = getTodayDate();
-            const stored = localStorage.getItem('vipUsage') || '{}';
-            const usage = JSON.parse(stored);
-            if (usage.date !== today) {
-                usage.date = today;
-                usage.count = 0;
-            }
-            usage.count = (usage.count || 0) + 1;
-            localStorage.setItem('vipUsage', JSON.stringify(usage));
-        }
-
-        function tryUnlockVip() {
-            const input = document.getElementById('vipUnlockCode');
-            const errorEl = document.getElementById('vipUnlockError');
-            const successEl = document.getElementById('vipUnlockSuccess');
-            if (!input || !errorEl || !successEl) return;
-            const code = input.value.trim().toUpperCase();
-            errorEl.style.display = 'none';
-            successEl.style.display = 'none';
-            if (code === VIP_CODE.toUpperCase()) {
-                localStorage.setItem('vipUnlocked', 'true');
-                successEl.textContent = '✅ 解锁成功！所有 VIP 工具永久可用 🎉';
-                successEl.style.display = 'block';
-                errorEl.style.display = 'none';
-                setTimeout(() => { closeVipUnlockModal(); renderTools(); }, 1500);
-            } else {
-                errorEl.textContent = '❌ 解锁码错误，请检查后重试';
-                errorEl.style.display = 'block';
-            }
-        }
-
-        function showVipUnlockModal() {
-            document.getElementById('vipUnlockModal').classList.add('active');
-            const inp = document.getElementById('vipUnlockCode');
-            const err = document.getElementById('vipUnlockError');
-            const suc = document.getElementById('vipUnlockSuccess');
-            if (inp) { inp.value = ''; inp.focus(); }
-            if (err) err.style.display = 'none';
-            if (suc) suc.style.display = 'none';
-        }
-
-        function closeVipUnlockModal() {
-            document.getElementById('vipUnlockModal').classList.remove('active');
-        }
-
-        function showVipLimitModal() {
-            document.getElementById('vipLimitModal').classList.add('active');
-        }
-
-        function closeVipLimitModal() {
-            document.getElementById('vipLimitModal').classList.remove('active');
-        }
-
-        function canUseVipTool() {
-            if (isVipUnlocked()) return true;
-            return getVipUsageToday() < VIP_DAILY_LIMIT;
-        }
+        // ========== VIP 功能（已移除 - 所有工具免费开放 ==========
+        // 打赏改为自愿支持，不设VIP限制
 
         function openTool(toolId) {
             const tool = tools.find(t => t.id === toolId);
-
-            // VIP 工具权限检查
-            if (tool.type === 'vip' && !isVipUnlocked()) {
-                if (!canUseVipTool()) {
-                    showVipLimitModal();
-                    return;
-                }
-                incrementVipUsage();
-            }
 
             let content = toolTemplates[toolId] || '<p>该工具正在开发中...</p>';
             openModal(tool.icon + ' ' + tool.name, content);
