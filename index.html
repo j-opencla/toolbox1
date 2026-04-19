@@ -39,6 +39,26 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: #fff !important;
+            -webkit-text-fill-color: #fff !important;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            vertical-align: middle;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
         }
         header p {
             color: #8892b0;
@@ -922,7 +942,7 @@
         </div>
         
         <header>
-            <h1>🧰 ToolsBox</h1>
+            <h1>🧰 ToolsBox <span class="version-badge">v1.0.0</span></h1>
             <p>免费在线工具箱，让你的工作更高效</p>
             <div class="stats">
                 <div class="stat-item">
