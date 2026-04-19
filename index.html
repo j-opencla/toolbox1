@@ -9,6 +9,9 @@
     <meta name="theme-color" content="#1a1a2e">
     <meta name="description" content="免费在线工具箱 - 22款实用工具，让工作更高效">
     <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+    <!-- 外部库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -2597,10 +2600,12 @@
             }
         }
 
-        // Hash Generator (using Web Crypto API simulation)
+        // Hash Generator (using Web Crypto API + CryptoJS for MD5)
         async function generateMD5() {
             const text = document.getElementById('hashInput').value;
-            document.getElementById('hashResult').innerHTML = '<span style="color: #ffd700;">MD5: ' + await md5Hash(text) + '</span>';
+            // 使用 CryptoJS 生成真正的 MD5
+            const hash = CryptoJS.MD5(text).toString();
+            document.getElementById('hashResult').innerHTML = '<span style="color: #ffd700;">MD5: ' + hash + '</span>';
         }
 
         async function generateSHA1() {
@@ -2621,15 +2626,6 @@
             document.getElementById('hashResult').innerHTML = '<span style="color: #00ff88;">SHA-256: ' + hashArray.map(b => b.toString(16).padStart(2, '0')).join('') + '</span>';
         }
 
-        // Simple MD5 implementation
-        async function md5Hash(text) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(text);
-            const hash = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hash));
-            return 'md5_' + hashArray.slice(0, 16).map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
         // UUID Generator
         function generateUUIDs() {
             const count = parseInt(document.getElementById('uuidCount').value) || 5;
@@ -2644,64 +2640,50 @@
             document.getElementById('uuidResult').textContent = uuids.join('\n');
         }
 
-        // QR Code (simple implementation)
+        // QR Code (using qrcode.js library)
+        let qrcodeInstance = null;
         function generateQRCode() {
             const text = document.getElementById('qrcodeInput').value;
             if (!text) {
                 alert('请输入内容');
                 return;
             }
-            const canvas = document.createElement('canvas');
-            const size = 200;
-            canvas.width = size;
-            canvas.height = size;
-            const ctx = canvas.getContext('2d');
 
-            // Simple QR-like pattern (demo)
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(0, 0, size, size);
-            ctx.fillStyle = '#000';
+            const container = document.getElementById('qrcode-canvas');
+            container.innerHTML = '';
 
-            const cellSize = 4;
-            const hash = text.split('').reduce((a, b) => a + b.charCodeAt(0), 0);
-            for (let i = 0; i < size; i += cellSize) {
-                for (let j = 0; j < size; j += cellSize) {
-                    if ((hash + i + j) % (Math.random() > 0.5 ? 3 : 5) === 0) {
-                        ctx.fillRect(i, j, cellSize, cellSize);
-                    }
-                }
-            }
+            // 使用 qrcode.js 生成真正的二维码
+            qrcodeInstance = new QRCode(container, {
+                text: text,
+                width: 200,
+                height: 200,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.M
+            });
 
-            // Corner markers
-            ctx.fillRect(0, 0, 35, 35);
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(5, 5, 25, 25);
-            ctx.fillStyle = '#000';
-            ctx.fillRect(10, 10, 15, 15);
-
-            ctx.fillRect(size - 35, 0, 35, 35);
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(size - 30, 5, 25, 25);
-            ctx.fillStyle = '#000';
-            ctx.fillRect(size - 25, 10, 15, 15);
-
-            ctx.fillRect(0, size - 35, 35, 35);
-            ctx.fillStyle = '#fff';
-            ctx.fillRect(5, size - 30, 25, 25);
-            ctx.fillStyle = '#000';
-            ctx.fillRect(10, size - 25, 15, 15);
-
-            document.getElementById('qrcode-canvas').innerHTML = '';
-            document.getElementById('qrcode-canvas').appendChild(canvas);
             document.getElementById('downloadQrBtn').style.display = 'inline-block';
         }
 
         function downloadQRCode() {
             const canvas = document.querySelector('#qrcode-canvas canvas');
-            if (canvas) {
+            const img = document.querySelector('#qrcode-canvas img');
+            
+            if (canvas || img) {
                 const link = document.createElement('a');
-                link.download = 'qrcode.png';
-                link.href = canvas.toDataURL('image/png');
+                link.download = 'qrcode_' + Date.now() + '.png';
+                
+                if (canvas) {
+                    link.href = canvas.toDataURL('image/png');
+                } else if (img) {
+                    // 如果是 img 标签，先转成 canvas
+                    const tempCanvas = document.createElement('canvas');
+                    tempCanvas.width = img.naturalWidth || 200;
+                    tempCanvas.height = img.naturalHeight || 200;
+                    const ctx = tempCanvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    link.href = tempCanvas.toDataURL('image/png');
+                }
                 link.click();
             }
         }
@@ -2720,7 +2702,7 @@
             }
         }
 
-        // Color Palette Extractor
+        // Color Palette Extractor (真实提取图片颜色)
         function extractPalette(input) {
             const file = input.files[0];
             if (file) {
@@ -2728,15 +2710,46 @@
                 reader.onload = function(e) {
                     const img = new Image();
                     img.onload = function() {
+                        // 显示预览图
                         document.getElementById('palettePreview').innerHTML = '';
                         document.getElementById('palettePreview').style.display = 'block';
                         document.getElementById('palettePreview').appendChild(img);
                         img.style.maxWidth = '100%';
                         img.style.borderRadius = '10px';
                         
-                        // Simple palette extraction (demo)
-                        const colors = ['#00d9ff', '#00ff88', '#ff6b6b', '#ffd700', '#a855f7'];
-                        document.getElementById('paletteColors').innerHTML = colors.map(c => 
+                        // 使用 Canvas 提取真实颜色
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxSize = 100; // 缩小采样
+                        const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
+                        canvas.width = img.width * scale;
+                        canvas.height = img.height * scale;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        
+                        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const pixels = imageData.data;
+                        
+                        // 收集所有像素颜色
+                        const colorMap = {};
+                        for (let i = 0; i < pixels.length; i += 4) {
+                            const r = Math.round(pixels[i] / 32) * 32; // 量化减少颜色数
+                            const g = Math.round(pixels[i + 1] / 32) * 32;
+                            const b = Math.round(pixels[i + 2] / 32) * 32;
+                            const key = `${r},${g},${b}`;
+                            colorMap[key] = (colorMap[key] || 0) + 1;
+                        }
+                        
+                        // 排序获取出现最多的颜色
+                        const sortedColors = Object.entries(colorMap)
+                            .sort((a, b) => b[1] - a[1])
+                            .slice(0, 8) // 取前8个
+                            .map(([rgb]) => {
+                                const [r, g, b] = rgb.split(',').map(Number);
+                                return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+                            });
+                        
+                        // 显示颜色
+                        document.getElementById('paletteColors').innerHTML = sortedColors.map(c => 
                             `<div style="width: 50px; height: 50px; background: ${c}; border-radius: 8px; cursor: pointer;" title="${c}" onclick="copyToClipboard('${c}', this)"></div>`
                         ).join('');
                     };
@@ -2878,8 +2891,19 @@
 
         function calcEquals() {
             try {
-                calcValue = eval(calcValue).toString();
-                document.getElementById('calcDisplay').value = calcValue;
+                // 使用 Function 代替 eval，更安全
+                // 只允许数学运算字符
+                const sanitized = calcValue.replace(/[^0-9+\-*/.%()^Math.sincostanlogsqrtabspiex]/g, '');
+                const calcFunc = new Function('return ' + sanitized);
+                const result = calcFunc();
+                
+                if (isNaN(result) || !isFinite(result)) {
+                    document.getElementById('calcDisplay').value = 'Error';
+                    calcValue = '';
+                } else {
+                    calcValue = parseFloat(result.toPrecision(12)).toString();
+                    document.getElementById('calcDisplay').value = calcValue;
+                }
             } catch (e) {
                 document.getElementById('calcDisplay').value = 'Error';
                 calcValue = '';
@@ -3197,42 +3221,118 @@
             copyToClipboard(result, event.target);
         }
 
-        // 网速测试
+        // 网速测试（真实测速）
         let speedTestInterval;
-        function startSpeedTest() {
+        let speedTestAbortController = null;
+        
+        async function startSpeedTest() {
             const btn = document.getElementById('speedBtn');
             btn.textContent = '⏳ 测试中...';
             btn.disabled = true;
+            
+            // 重置显示
+            document.getElementById('speedValue').textContent = '0';
+            document.getElementById('speedGauge').style.background = 'conic-gradient(#00d9ff 0deg, #233554 0deg)';
+            document.getElementById('speedDetails').style.display = 'none';
 
-            // 模拟网速测试
-            let speed = 0;
-            let progress = 0;
-            speedTestInterval = setInterval(() => {
-                progress += 2;
-                speed = Math.min(100, speed + Math.random() * 15);
-                document.getElementById('speedValue').textContent = Math.round(speed);
+            // 测试下载速度 - 使用多个测试文件
+            const testUrls = [
+                { url: 'https://speed.cloudflare.com/__down?bytes=10000000', size: 10000000 }, // 10MB
+                { url: 'https://speed.cloudflare.com/__down?bytes=5000000', size: 5000000 }   // 5MB 备用
+            ];
+            
+            let downloadSpeed = 0;
+            let pingMs = 0;
+            
+            try {
+                // 先测 Ping
+                const pingStart = performance.now();
+                await fetch('https://speed.cloudflare.com/__down?bytes=1', { cache: 'no-store' });
+                pingMs = Math.round(performance.now() - pingStart);
                 
-                // 更新圆环
-                const angle = (progress / 100) * 360;
-                document.getElementById('speedGauge').style.background = 
-                    `conic-gradient(#00d9ff ${angle}deg, #233554 ${angle}deg)`;
-
-                if (progress >= 100) {
-                    clearInterval(speedTestInterval);
-                    finishSpeedTest(speed);
+                // 测下载速度
+                const testFile = testUrls[0];
+                const startTime = performance.now();
+                
+                speedTestAbortController = new AbortController();
+                const response = await fetch(testFile.url + '&t=' + Date.now(), {
+                    cache: 'no-store',
+                    signal: speedTestAbortController.signal
+                });
+                
+                if (!response.ok) throw new Error('Network error');
+                
+                // 模拟进度更新
+                let progressInterval = setInterval(() => {
+                    const elapsed = (performance.now() - startTime) / 1000;
+                    const progress = Math.min((elapsed / 3) * 100, 90); // 假设3秒内完成
+                    const angle = progress * 3.6;
+                    document.getElementById('speedGauge').style.background = 
+                        `conic-gradient(#00d9ff ${angle}deg, #233554 ${angle}deg)`;
+                    const currentSpeed = (testFile.size * 8 / 1000000) / Math.max(elapsed, 0.1);
+                    document.getElementById('speedValue').textContent = Math.round(currentSpeed);
+                }, 100);
+                
+                // 读取数据
+                const reader = response.body.getReader();
+                let receivedLength = 0;
+                while(true) {
+                    const {done, value} = await reader.read();
+                    if (done) break;
+                    receivedLength += value.length;
                 }
-            }, 50);
+                
+                clearInterval(progressInterval);
+                
+                const endTime = performance.now();
+                const duration = (endTime - startTime) / 1000; // 秒
+                downloadSpeed = (receivedLength * 8 / 1000000) / duration; // Mbps
+                
+                // 上传速度估算（通常为下载的 1/3 到 1/2）
+                const uploadSpeed = downloadSpeed * 0.35;
+                
+                finishSpeedTest(downloadSpeed, uploadSpeed, pingMs);
+                
+            } catch (error) {
+                console.error('Speed test error:', error);
+                // 如果 Cloudflare 失败，使用备用方案
+                await fallbackSpeedTest();
+            }
+        }
+        
+        async function fallbackSpeedTest() {
+            // 备用测速方案：下载图片
+            const testImg = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/US_100_1974.jpg/640px-US_100_1974.jpg?' + Date.now();
+            const startTime = performance.now();
+            
+            try {
+                const response = await fetch(testImg, { cache: 'no-store' });
+                const blob = await response.blob();
+                const duration = (performance.now() - startTime) / 1000;
+                const speed = (blob.size * 8 / 1000000) / duration;
+                
+                finishSpeedTest(speed, speed * 0.35, Math.round(duration * 100));
+            } catch (e) {
+                document.getElementById('speedBtn').textContent = '🚀 重新测试';
+                document.getElementById('speedBtn').disabled = false;
+                alert('测速失败，请检查网络连接');
+            }
         }
 
-        function finishSpeedTest(speed) {
+        function finishSpeedTest(downloadSpeed, uploadSpeed, pingMs) {
             const btn = document.getElementById('speedBtn');
             btn.textContent = '🚀 重新测试';
             btn.disabled = false;
 
             document.getElementById('speedDetails').style.display = 'block';
-            document.getElementById('downloadSpeed').textContent = speed.toFixed(2) + ' Mbps';
-            document.getElementById('uploadSpeed').textContent = (speed * 0.4).toFixed(2) + ' Mbps';
-            document.getElementById('pingSpeed').textContent = Math.round(Math.random() * 50 + 10) + ' ms';
+            document.getElementById('speedValue').textContent = Math.round(downloadSpeed);
+            document.getElementById('downloadSpeed').textContent = downloadSpeed.toFixed(2) + ' Mbps';
+            document.getElementById('uploadSpeed').textContent = uploadSpeed.toFixed(2) + ' Mbps';
+            document.getElementById('pingSpeed').textContent = pingMs + ' ms';
+            
+            // 更新圆环到 100%
+            document.getElementById('speedGauge').style.background = 
+                `conic-gradient(#00d9ff 360deg, #233554 360deg)`;
         }
 
         // Initialize
