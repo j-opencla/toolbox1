@@ -897,7 +897,7 @@
             </div>
             <div class="shortcut-item">
                 <span>我的收藏</span>
-                <span class="shortcut-key">Ctrl + F</span>
+                <span class="shortcut-key">Alt + F</span>
             </div>
             <div class="shortcut-item">
                 <span>更新日志</span>
@@ -958,7 +958,7 @@
             </div>
             <div class="toolbar-buttons">
                 <button class="toolbar-btn" onclick="showFavorites()" title="我的收藏">
-                    ⭐ 我的收藏 <span class="shortcut-hint">(Ctrl+F)</span>
+                    ⭐ 我的收藏 <span class="shortcut-hint">(Alt+F)</span>
                 </button>
                 <button class="toolbar-btn" onclick="toggleTheme()" title="切换主题">
                     🌙 主题
@@ -1162,15 +1162,21 @@
             );
             
             if (matches.length > 0) {
-                resultsContainer.innerHTML = matches.slice(0, 10).map(tool => `
+                resultsContainer.innerHTML = matches.slice(0, 10).map(tool => {
+                    // 高亮匹配文字
+                    const highlightText = (text, query) => {
+                        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                        return text.replace(regex, '<mark style="background: rgba(0, 217, 255, 0.3); color: #00d9ff; padding: 0 2px; border-radius: 2px;">$1</mark>');
+                    };
+                    return `
                     <div class="search-result-item" onclick="openTool('${tool.id}'); document.getElementById('searchResults').classList.remove('active'); document.getElementById('searchInput').value = '';">
                         <div class="tool-icon">${tool.icon}</div>
                         <div>
-                            <h4>${tool.name}</h4>
-                            <p>${tool.description}</p>
+                            <h4>${highlightText(tool.name, query)}</h4>
+                            <p>${highlightText(tool.description, query)}</p>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
                 resultsContainer.classList.add('active');
             } else {
                 resultsContainer.innerHTML = '<div class="search-result-item"><p>没有找到匹配的工具</p></div>';
@@ -1221,8 +1227,8 @@
                 e.preventDefault();
                 toggleTheme();
             }
-            // Ctrl+F - 收藏
-            if (e.ctrlKey && e.key === 'f') {
+            // Alt+F - 收藏
+            if (e.altKey && e.key === 'f') {
                 e.preventDefault();
                 showFavorites();
             }
@@ -1318,6 +1324,151 @@
                     '点击"生成二维码"按钮',
                     '预览生成的二维码',
                     '点击"下载二维码"保存图片'
+                ]
+            },
+            'system-info': {
+                title: '系统信息查看使用教程',
+                steps: [
+                    '打开工具即可自动显示系统信息',
+                    '查看操作系统、浏览器、屏幕分辨率等信息',
+                    '点击"复制信息"按钮复制全部信息',
+                    '无需任何操作，实时更新窗口大小'
+                ]
+            },
+            'json-formatter': {
+                title: 'JSON格式化使用教程',
+                steps: [
+                    '在文本框中粘贴JSON内容',
+                    '点击"格式化"美化JSON显示',
+                    '点击"压缩"去除空白符',
+                    '点击"校验"检查JSON有效性',
+                    '点击"复制结果"复制处理后的JSON'
+                ]
+            },
+            'regex-tester': {
+                title: '正则表达式测试教程',
+                steps: [
+                    '在"正则表达式"框输入正则模式',
+                    '在"测试文本"框输入要匹配的文本',
+                    '勾选"全局匹配"或"忽略大小写"选项',
+                    '点击"测试匹配"查看所有匹配结果'
+                ]
+            },
+            'base64': {
+                title: 'Base64编解码使用教程',
+                steps: [
+                    '输入文本或点击"打开文件"选择文件',
+                    '点击"编码 → Base64"转换为Base64',
+                    '点击"解码 ← Base64"还原文本',
+                    '点击"复制结果"复制处理结果'
+                ]
+            },
+            'url-encode': {
+                title: 'URL编码解码使用教程',
+                steps: [
+                    '在文本框输入URL或参数',
+                    '点击"编码"转换为URL安全格式',
+                    '点击"解码"还原特殊字符',
+                    '适用于处理中文参数和特殊符号'
+                ]
+            },
+            'timestamp': {
+                title: '时间戳转换使用教程',
+                steps: [
+                    '自动显示当前时间戳',
+                    '输入时间戳（秒或毫秒）点击"时间戳→日期"',
+                    '输入日期时间点击"日期→时间戳"',
+                    '支持多种日期格式自动识别'
+                ]
+            },
+            'hash-generator': {
+                title: '哈希值生成使用教程',
+                steps: [
+                    '在文本框输入要计算哈希的内容',
+                    '点击"MD5"生成MD5哈希值',
+                    '点击"SHA-1"或"SHA-256"生成对应哈希',
+                    '可用于文件完整性校验和密码加密'
+                ]
+            },
+            'uuid-generator': {
+                title: 'UUID生成器使用教程',
+                steps: [
+                    '设置要生成的UUID数量（1-100）',
+                    '点击"生成UUID"批量生成',
+                    '点击每个UUID右侧的"复制"单独复制',
+                    '点击"复制全部"一次性复制所有UUID'
+                ]
+            },
+            'color-palette': {
+                title: '调色板生成器使用教程',
+                steps: [
+                    '点击上传区域选择图片文件',
+                    '自动分析图片提取主要颜色',
+                    '点击任意颜色块复制十六进制值',
+                    '支持提取5个主要配色'
+                ]
+            },
+            'text-diff': {
+                title: '文本对比使用教程',
+                steps: [
+                    '在"原始文本"框输入原始内容',
+                    '在"修改文本"框输入修改后的内容',
+                    '点击"开始对比"查看差异',
+                    '红色标记删除内容，绿色标记新增内容'
+                ]
+            },
+            'word-counter': {
+                title: '字数统计使用教程',
+                steps: [
+                    '在文本框输入或粘贴内容',
+                    '自动实时统计字符数和字数',
+                    '中英文分开统计，准确计数',
+                    '同时显示行数和字节数'
+                ]
+            },
+            'random-generator': {
+                title: '随机数生成使用教程',
+                steps: [
+                    '勾选要包含的字符类型',
+                    '设置密码长度或随机数范围',
+                    '点击"生成密码"或"生成随机数"',
+                    '点击复制按钮复制生成结果'
+                ]
+            },
+            'countdown': {
+                title: '倒计时器使用教程',
+                steps: [
+                    '输入事件名称和目标日期时间',
+                    '点击"开始倒计时"启动计时器',
+                    '实时显示剩余天、时、分、秒',
+                    '倒计时结束会有提示音提醒'
+                ]
+            },
+            'calculator': {
+                title: '高级计算器使用教程',
+                steps: [
+                    '点击数字和运算符输入算式',
+                    '点击"="计算结果',
+                    '支持科学函数：sin、cos、tan、sqrt等',
+                    '点击"C"清空，点击"⌫"退格'
+                ]
+            },
+            'unit-converter': {
+                title: '单位转换器使用教程',
+                steps: [
+                    '选择要转换的单位类型',
+                    '输入要转换的数值',
+                    '选择源单位和目标单位',
+                    '自动实时显示转换结果'
+                ]
+            },
+            'emoji-picker': {
+                title: 'Emoji表情大全使用教程',
+                steps: [
+                    '在搜索框输入关键词筛选表情',
+                    '浏览表情列表找到想要的表情',
+                    '点击表情自动复制到剪贴板',
+                    '支持搜索中英文表情名称'
                 ]
             }
         };
@@ -2510,8 +2661,13 @@
 
         // JSON Formatter
         function formatJson() {
+            const input = document.getElementById('jsonInput').value;
+            if (input.length > 1000000) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大，请限制在1MB以内</span>';
+                return;
+            }
             try {
-                const json = JSON.parse(document.getElementById('jsonInput').value);
+                const json = JSON.parse(input);
                 document.getElementById('jsonResult').textContent = JSON.stringify(json, null, 2);
             } catch (e) {
                 document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
@@ -2519,8 +2675,13 @@
         }
 
         function compressJson() {
+            const input = document.getElementById('jsonInput').value;
+            if (input.length > 1000000) {
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大，请限制在1MB以内</span>';
+                return;
+            }
             try {
-                const json = JSON.parse(document.getElementById('jsonInput').value);
+                const json = JSON.parse(input);
                 document.getElementById('jsonResult').textContent = JSON.stringify(json);
             } catch (e) {
                 document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ JSON格式错误: ' + e.message + '</span>';
@@ -2612,6 +2773,11 @@
         function handleBase64File(input) {
             const file = input.files[0];
             if (!file) return;
+            if (file.size > 5 * 1024 * 1024) {
+                alert('文件过大，请限制在5MB以内');
+                input.value = '';
+                return;
+            }
             document.getElementById('base64FileName').textContent = '📄 ' + file.name;
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -2759,15 +2925,19 @@
         // Image to Base64
         function convertImageToBase64(input) {
             const file = input.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imagePreview').style.display = 'block';
-                    document.getElementById('base64ImageResult').value = e.target.result;
-                };
-                reader.readAsDataURL(file);
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) {
+                alert('图片过大，请限制在10MB以内');
+                input.value = '';
+                return;
             }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('base64ImageResult').value = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         // Color Palette Extractor (真实提取图片颜色)
