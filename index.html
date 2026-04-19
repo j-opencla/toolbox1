@@ -4,11 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ToolsBox - 在线工具箱</title>
-    <!-- PWA 支持 -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1a1a2e">
     <meta name="description" content="免费在线工具箱 - 22款实用工具，让工作更高效">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧰</text></svg>">
+    <meta name="keywords" content="在线工具,工具箱,JSON格式化,二维码生成,Base64编码,时间戳转换">
+    <meta name="author" content="ToolsBox">
+    <meta property="og:title" content="ToolsBox - 在线工具箱">
+    <meta property="og:description" content="22款免费在线工具，浏览器端运行，数据安全">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
     <!-- 外部库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
@@ -54,11 +56,11 @@
             border-radius: 12px;
             font-weight: 600;
             vertical-align: middle;
-            animation: pulse 2s infinite;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.8; transform: scale(1.02); }
+        .version-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
         header p {
             color: #8892b0;
@@ -137,21 +139,22 @@
             margin-bottom: 6px;
         }
         .tool-card h3 {
-            font-size: 0.8rem;
-            margin-bottom: 3px;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
         }
         .tool-card p {
-            color: #8892b0;
-            font-size: 0.65rem;
-            line-height: 1.2;
+            color: #9ba3b8;
+            font-size: 0.75rem;
+            line-height: 1.5;
         }
         .tool-usage {
             color: #a0aec0;
-            font-size: 0.6rem !important;
-            margin-top: 3px;
-            padding: 3px;
+            font-size: 0.7rem !important;
+            line-height: 1.4;
+            margin-top: 5px;
+            padding: 4px 6px;
             background: rgba(0, 217, 255, 0.05);
-            border-radius: 3px;
+            border-radius: 4px;
             border-left: 2px solid #00d9ff;
         }
         .tool-usage-badge {
@@ -839,6 +842,34 @@
             .modal-content {
                 padding: 20px;
             }
+            .top-toolbar {
+                flex-direction: column;
+                gap: 12px;
+            }
+            .toolbar-buttons {
+                justify-content: center;
+            }
+            .stats {
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            .stat-item {
+                min-width: 80px;
+            }
+            .version-badge {
+                font-size: 0.65rem;
+                padding: 3px 8px;
+            }
+        }
+
+        /* 平板适配 */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .tools-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .container {
+                max-width: 900px;
+            }
         }
     </style>
 </head>
@@ -942,7 +973,7 @@
         </div>
         
         <header>
-            <h1>🧰 ToolsBox <span class="version-badge">v1.0.0</span></h1>
+            <h1>🧰 ToolsBox <span class="version-badge">v1.6.0</span></h1>
             <p>免费在线工具箱，让你的工作更高效</p>
             <div class="stats">
                 <div class="stat-item">
@@ -1041,7 +1072,11 @@
             <h2 style="color: #667eea;">☕ 请我喝杯咖啡</h2>
             <p style="color: #8892b0;">您的支持是我们持续更新最大的动力</p>
             <div style="margin: 25px 0;">
-                <img src="donate-qr.jpg" style="max-width: 220px; border-radius: 10px; border: 2px solid #667eea;" alt="赞赏码">
+                <img src="donate-qr.jpg" style="max-width: 220px; border-radius: 10px; border: 2px solid #667eea;" alt="赞赏码" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div style="display:none; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 10px; border: 2px dashed #667eea;">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">☕</div>
+                    <div style="color: #ccd6f6; font-size: 0.9rem;">扫码打赏功能维护中<br>感谢您的支持！</div>
+                </div>
             </div>
             <p style="color: #ccd6f6; font-size: 0.95rem;">💡 扫码任意金额打赏，感谢您的支持！</p>
             <p style="color: #8892b0; font-size: 0.85rem; margin-top: 15px;">不打赏也能用大部分功能，VIP 工具每日限用 3 次 😊</p>
@@ -1372,10 +1407,23 @@
                 e.preventDefault();
                 const toolId = toolCard.getAttribute('onclick').match(/'([^']+)'/)[1];
                 contextMenuToolId = toolId;
-                
+
                 const menu = document.getElementById('contextMenu');
-                menu.style.left = e.pageX + 'px';
-                menu.style.top = e.pageY + 'px';
+                // 边界检测，防止菜单溢出屏幕
+                const menuWidth = 180;
+                const menuHeight = 120;
+                let left = e.pageX;
+                let top = e.pageY;
+
+                if (left + menuWidth > window.innerWidth) {
+                    left = window.innerWidth - menuWidth - 10;
+                }
+                if (top + menuHeight > window.innerHeight + window.scrollY) {
+                    top = window.innerHeight + window.scrollY - menuHeight - 10;
+                }
+
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
                 menu.classList.add('active');
                 
                 // 更新菜单文字
@@ -1442,7 +1490,7 @@
                 icon: '📁',
                 category: 'text',
                 tag: '文件工具',
-                usage: '上传文件 → 设置规则 → 复制结果',
+                description: '为文件批量添加前缀、后缀或序号重命名',
                 type: 'vip'
             },
             {
@@ -3092,6 +3140,15 @@
             let url = urlInput;
             if (!url.startsWith('http://') && !url.startsWith('https://')) {
                 url = 'https://' + url;
+            }
+
+            // URL 格式验证
+            try {
+                new URL(url);
+            } catch (e) {
+                document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入有效的网址（如：example.com）</span>';
+                document.getElementById('screenshotError').style.display = 'block';
+                return;
             }
 
             // 显示加载中
