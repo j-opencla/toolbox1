@@ -1,0 +1,20 @@
+{
+  "name": "ToolsBox 在线工具箱",
+  "short_name": "ToolsBox",
+  "description": "免费在线工具箱 - 22款实用工具，让工作更高效",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#00d9ff",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%231a1a2e' width='512' height='512' rx='80'/><text y='.9em' font-size='320' x='50'>🧰</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["utilities", "productivity"],
+  "lang": "zh-CN"
+}
