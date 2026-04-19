@@ -1748,7 +1748,12 @@
             'base64': `
                 <div class="form-group">
                     <label>输入文本</label>
-                    <textarea id="base64Input" placeholder="输入要编码/解码的文本"></textarea>
+                    <div style="display:flex; gap:8px; margin-bottom:8px;">
+                        <input type="file" id="base64FileInput" onchange="handleBase64File(this)" style="display:none;">
+                        <button class="btn btn-secondary" onclick="document.getElementById('base64FileInput').click()">📂 打开文件</button>
+                        <span id="base64FileName" style="color:#8892b0; font-size:0.85rem; align-self:center;"></span>
+                    </div>
+                    <textarea id="base64Input" placeholder="输入要编码/解码的文本，或点击上方「打开文件」读取文件内容"></textarea>
                 </div>
                 <button class="btn btn-primary" onclick="encodeBase64()">编码 → Base64</button>
                 <button class="btn btn-secondary" onclick="decodeBase64()">解码 ← Base64</button>
@@ -2533,6 +2538,17 @@
         }
 
         // Base64
+        function handleBase64File(input) {
+            const file = input.files[0];
+            if (!file) return;
+            document.getElementById('base64FileName').textContent = '📄 ' + file.name;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('base64Input').value = e.target.result;
+            };
+            reader.readAsText(file);
+        }
+
         function encodeBase64() {
             const text = document.getElementById('base64Input').value;
             document.getElementById('base64Result').textContent = btoa(unescape(encodeURIComponent(text)));
