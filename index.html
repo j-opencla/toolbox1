@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -1085,6 +1085,7 @@
 
     <script>
         // ========== PWA: 注册 Service Worker ==========
+(function() {
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function() {
                 navigator.serviceWorker.register('sw.js')
@@ -1092,12 +1093,12 @@
                         console.log('SW registered:', registration.scope);
                     })
                     .catch(function(error) {
-                        // sw.js 在本地文件访问时不可用，属正常现象，忽略即可
+                        // sw.js 在本地文件访问时不可用,属正常现象,忽略即可
                     });
             });
         }
         
-        // ========== 新功能：搜索功能 ==========
+        // ========== 新功能:搜索功能 ==========
         let contextMenuToolId = null;
         
         document.getElementById('searchInput').addEventListener('input', function(e) {
@@ -1144,7 +1145,7 @@
             }
         });
         
-        // ========== 新功能：主题切换 ==========
+        // ========== 新功能:主题切换 ==========
         function toggleTheme() {
             const body = document.body;
             const themeBtn = document.querySelector('.toolbar-btn:nth-child(2)');
@@ -1169,7 +1170,7 @@
             }
         });
         
-        // ========== 新功能：快捷键支持 ==========
+        // ========== 新功能:快捷键支持 ==========
         document.addEventListener('keydown', function(e) {
             // Ctrl+K - 搜索
             if (e.ctrlKey && e.key === 'k') {
@@ -1199,12 +1200,12 @@
             }
         });
         
-        // ========== 新功能：快捷键面板 ==========
+        // ========== 新功能:快捷键面板 ==========
         function showShortcuts() {
             document.getElementById('shortcutsPanel').classList.add('active');
         }
         
-        // ========== 新功能：分类折叠 ==========
+        // ========== 新功能:分类折叠 ==========
         let categoriesCollapsed = false;
         
         function toggleCategories() {
@@ -1222,23 +1223,23 @@
             }
         }
         
-        // ========== 新功能：工具教程 ==========
+        // ========== 新功能:工具教程 ==========
         const toolTutorials = {
             'screenshot': {
                 title: '网页截图工具使用教程',
                 steps: [
                     '在输入框中输入要截图的网页网址',
                     '点击"开始截图"按钮',
-                    '等待几秒钟，页面加载完成后自动生成截图',
+                    '等待几秒钟,页面加载完成后自动生成截图',
                     '点击"下载图片"按钮保存截图'
                 ]
             },
             'batch-rename': {
                 title: '批量重命名使用教程',
                 steps: [
-                    '点击上传区域，选择要重命名的多个文件',
-                    '选择重命名规则：前缀、后缀或序号',
-                    '输入前缀/后缀内容，或设置起始编号',
+                    '点击上传区域,选择要重命名的多个文件',
+                    '选择重命名规则:前缀、后缀或序号',
+                    '输入前缀/后缀内容,或设置起始编号',
                     '点击"生成新名称"预览结果',
                     '点击"复制新名称列表"复制结果'
                 ]
@@ -1247,9 +1248,9 @@
                 title: '图片转Base64使用教程',
                 steps: [
                     '点击上传区域选择图片文件',
-                    '等待转换完成，Base64编码将显示在下方',
+                    '等待转换完成,Base64编码将显示在下方',
                     '点击"复制Base64"按钮复制编码',
-                    '粘贴到需要使用的地方（注意带data:image前缀）'
+                    '粘贴到需要使用的地方(注意带data:image前缀)'
                 ]
             },
             'speed-test': {
@@ -1265,10 +1266,10 @@
                 title: '取色器使用教程',
                 steps: [
                     '点击颜色选择器选择颜色',
-                    '或输入HEX颜色值（如 #FF5733）',
+                    '或输入HEX颜色值(如 #FF5733)',
                     '实时查看颜色预览和转换结果',
                     '点击各格式旁边的复制按钮复制',
-                    '支持的格式：HEX、RGB、HSL'
+                    '支持的格式:HEX、RGB、HSL'
                 ]
             },
             'qrcode': {
@@ -1286,7 +1287,7 @@
                     '打开工具即可自动显示系统信息',
                     '查看操作系统、浏览器、屏幕分辨率等信息',
                     '点击"复制信息"按钮复制全部信息',
-                    '无需任何操作，实时更新窗口大小'
+                    '无需任何操作,实时更新窗口大小'
                 ]
             },
             'json-formatter': {
@@ -1330,7 +1331,7 @@
                 title: '时间戳转换使用教程',
                 steps: [
                     '自动显示当前时间戳',
-                    '输入时间戳（秒或毫秒）点击"时间戳→日期"',
+                    '输入时间戳(秒或毫秒)点击"时间戳→日期"',
                     '输入日期时间点击"日期→时间戳"',
                     '支持多种日期格式自动识别'
                 ]
@@ -1347,7 +1348,7 @@
             'uuid-generator': {
                 title: 'UUID生成器使用教程',
                 steps: [
-                    '设置要生成的UUID数量（1-100）',
+                    '设置要生成的UUID数量(1-100)',
                     '点击"生成UUID"批量生成',
                     '点击每个UUID右侧的"复制"单独复制',
                     '点击"复制全部"一次性复制所有UUID'
@@ -1368,7 +1369,7 @@
                     '在"原始文本"框输入原始内容',
                     '在"修改文本"框输入修改后的内容',
                     '点击"开始对比"查看差异',
-                    '红色标记删除内容，绿色标记新增内容'
+                    '红色标记删除内容,绿色标记新增内容'
                 ]
             },
             'word-counter': {
@@ -1376,7 +1377,7 @@
                 steps: [
                     '在文本框输入或粘贴内容',
                     '自动实时统计字符数和字数',
-                    '中英文分开统计，准确计数',
+                    '中英文分开统计,准确计数',
                     '同时显示行数和字节数'
                 ]
             },
@@ -1403,8 +1404,8 @@
                 steps: [
                     '点击数字和运算符输入算式',
                     '点击"="计算结果',
-                    '支持科学函数：sin、cos、tan、sqrt等',
-                    '点击"C"清空，点击"⌫"退格'
+                    '支持科学函数:sin、cos、tan、sqrt等',
+                    '点击"C"清空,点击"⌫"退格'
                 ]
             },
             'unit-converter': {
@@ -1446,8 +1447,8 @@
             'css-gradient': {
                 title: 'CSS渐变生成器使用教程',
                 steps: [
-                    '选择渐变类型（线性/径向）',
-                    '点击色块选择渐变颜色，可添加多个色标',
+                    '选择渐变类型(线性/径向)',
+                    '点击色块选择渐变颜色,可添加多个色标',
                     '调整渐变方向和角度',
                     '预览效果满意后点击复制CSS代码'
                 ]
@@ -1475,7 +1476,7 @@
             panel.scrollIntoView({ behavior: 'smooth' });
         }
         
-        // ========== 新功能：收藏功能 ==========
+        // ========== 新功能:收藏功能 ==========
         function getFavorites() {
             return JSON.parse(localStorage.getItem('favorites') || '[]');
         }
@@ -1528,11 +1529,11 @@
                 updateFavoritesUI();
                 favoritesSection.scrollIntoView({ behavior: 'smooth' });
             } else {
-                alert('您还没有收藏任何工具！\n\n右键点击工具卡片可以添加到收藏');
+                alert('您还没有收藏任何工具!\n\n右键点击工具卡片可以添加到收藏');
             }
         }
         
-        // ========== 新功能：右键菜单 ==========
+        // ========== 新功能:右键菜单 ==========
         document.addEventListener('contextmenu', function(e) {
             const toolCard = e.target.closest('.tool-card');
             if (toolCard) {
@@ -1541,7 +1542,7 @@
                 contextMenuToolId = toolId;
 
                 const menu = document.getElementById('contextMenu');
-                // 边界检测，防止菜单溢出屏幕
+                // 边界检测,防止菜单溢出屏幕
                 const menuWidth = 180;
                 const menuHeight = 120;
                 let left = e.pageX;
@@ -1612,7 +1613,7 @@
                 icon: '💻',
                 category: 'life',
                 tag: '网页工具',
-                usage: '打开即可查看，无需操作',
+                usage: '打开即可查看,无需操作',
                 type: 'free'
             },
             {
@@ -1818,7 +1819,7 @@
             {
                 id: 'password-checker',
                 name: '密码强度检测',
-                description: '分析密码安全等级，估算破解时间',
+                description: '分析密码安全等级,估算破解时间',
                 icon: '🔐',
                 category: 'dev',
                 tag: '开发工具',
@@ -1838,7 +1839,7 @@
             {
                 id: 'css-gradient',
                 name: 'CSS 渐变生成器',
-                description: '可视化创建渐变背景，一键复制CSS代码',
+                description: '可视化创建渐变背景,一键复制CSS代码',
                 icon: '🎨',
                 category: 'dev',
                 tag: '开发工具',
@@ -1942,7 +1943,7 @@
             'regex-tester': `
                 <div class="form-group">
                     <label>正则表达式</label>
-                    <input type="text" id="regexPattern" placeholder="输入正则，如: \\d{3,4}">
+                    <input type="text" id="regexPattern" placeholder="输入正则,如: \\d{3,4}">
                 </div>
                 <div class="form-group">
                     <label>测试文本</label>
@@ -1982,7 +1983,7 @@
                         <button class="btn btn-secondary" onclick="document.getElementById('base64FileInput').click()">📂 打开文件</button>
                         <span id="base64FileName" style="color:#8892b0; font-size:0.85rem; align-self:center;"></span>
                     </div>
-                    <textarea id="base64Input" placeholder="输入要编码/解码的文本，或点击上方「打开文件」读取文件内容"></textarea>
+                    <textarea id="base64Input" placeholder="输入要编码/解码的文本,或点击上方「打开文件」读取文件内容"></textarea>
                 </div>
                 <button class="btn btn-primary" onclick="encodeBase64()">编码 → Base64</button>
                 <button class="btn btn-secondary" onclick="decodeBase64()">解码 ← Base64</button>
@@ -2136,7 +2137,7 @@
             'countdown': `
                 <div class="form-group">
                     <label>事件名称</label>
-                    <input type="text" id="countdownName" placeholder="输入事件名称，如：新年">
+                    <input type="text" id="countdownName" placeholder="输入事件名称,如:新年">
                 </div>
                 <div class="form-group">
                     <label>目标日期</label>
@@ -2251,7 +2252,7 @@
                 </div>
                 <button class="btn btn-primary" onclick="captureScreenshot()">📸 开始截图</button>
                 <div id="screenshotPreview" style="margin-top: 20px; display: none;">
-                    <h4 style="color: #ccd6f6; margin-bottom: 10px;">截图预览：</h4>
+                    <h4 style="color: #ccd6f6; margin-bottom: 10px;">截图预览:</h4>
                     <img id="screenshotImg" style="max-width: 100%; border-radius: 10px; border: 2px solid #00d9ff;">
                     <button class="btn btn-primary" style="margin-top: 15px;" onclick="downloadScreenshot()">⬇️ 下载图片</button>
                 </div>
@@ -2306,7 +2307,7 @@
                     </div>
                 </div>
                 <div id="renamePreview" style="display: none; margin-top: 20px;">
-                    <h4 style="color: #ccd6f6; margin-bottom: 10px;">文件列表：</h4>
+                    <h4 style="color: #ccd6f6; margin-bottom: 10px;">文件列表:</h4>
                     <div id="renameFileList" style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px; max-height: 200px; overflow-y: auto;"></div>
                     <div style="margin-top: 20px;">
                         <label style="color: #ccd6f6;">命名规则</label>
@@ -2326,7 +2327,7 @@
                     </div>
                     <button class="btn btn-primary" onclick="generateNewNames()">✨ 生成新名称</button>
                     <div id="renameResult" style="margin-top: 20px; display: none;">
-                        <h4 style="color: #ccd6f6;">预览：</h4>
+                        <h4 style="color: #ccd6f6;">预览:</h4>
                         <div id="renameNewList" style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 15px;"></div>
                         <button class="btn btn-primary" style="margin-top: 15px;" onclick="copyRenameResult()">📋 复制新名称列表</button>
                     </div>
@@ -2397,7 +2398,7 @@
             'text-desensitize': `
                 <div class="form-group">
                     <label>输入文本</label>
-                    <textarea id="desensitizeInput" rows="6" placeholder="粘贴含敏感信息的文本，例如：&#10;张三 13812345678 身份证110101199003071234 &#10;邮箱 zhangsan@qq.com 银行卡6222021234567890123"></textarea>
+                    <textarea id="desensitizeInput" rows="6" placeholder="粘贴含敏感信息的文本,例如:&#10;张三 13812345678 身份证110101199003071234 &#10;邮箱 zhangsan@qq.com 银行卡6222021234567890123"></textarea>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px;">
                     <button class="btn btn-primary" onclick="desensitizeText()">🛡️ 一键脱敏</button>
@@ -2448,8 +2449,8 @@
         };
 
         // Open Tool
-        // ========== VIP 功能（已移除 - 所有工具免费开放 ==========
-        // 打赏改为自愿支持，不设VIP限制
+        // ========== VIP 功能(已移除 - 所有工具免费开放 ==========
+        // 打赏改为自愿支持,不设VIP限制
 
         function openTool(toolId) {
             const tool = tools.find(t => t.id === toolId);
@@ -2529,7 +2530,7 @@
             const section = document.getElementById('quickAccess');
             const recent = JSON.parse(localStorage.getItem('recentTools') || '[]');
             
-            // 如果没有任何数据，隐藏快速入口
+            // 如果没有任何数据,隐藏快速入口
             if (recent.length === 0) {
                 section.style.display = 'none';
                 return;
@@ -2559,7 +2560,7 @@
             localStorage.setItem('toolFeedback', JSON.stringify(feedback));
             
             document.getElementById('feedbackThanks').style.display = 'block';
-            document.getElementById('feedbackThanks').textContent = type === 'good' ? '👍 感谢您的支持！' : '📝 谢谢，我们会改进！';
+            document.getElementById('feedbackThanks').textContent = type === 'good' ? '👍 感谢您的支持!' : '📝 谢谢,我们会改进!';
         }
         
         function submitFeedbackText() {
@@ -2576,7 +2577,7 @@
             
             document.getElementById('feedbackText').value = '';
             document.getElementById('feedbackThanks').style.display = 'block';
-            document.getElementById('feedbackThanks').textContent = '✅ 反馈已提交，感谢！';
+            document.getElementById('feedbackThanks').textContent = '✅ 反馈已提交,感谢!';
         }
         
         // 工具排行榜面板
@@ -2593,7 +2594,7 @@
                             <button onclick="document.getElementById('rankPanel').remove()" style="background: none; border: none; color: #8892b0; font-size: 1.5rem; cursor: pointer;">✕</button>
                         </div>
                         <div style="margin-bottom: 15px; text-align: center;">
-                            <span style="color: #8892b0;">总使用次数：</span>
+                            <span style="color: #8892b0;">总使用次数:</span>
                             <span style="color: #00d9ff; font-size: 1.3rem; font-weight: bold;">${total}</span>
                         </div>
                         <div style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px;">
@@ -2678,7 +2679,7 @@
                 return;
             }
             if (input.length > 1000000) {
-                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大，请限制在1MB以内</span>';
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大,请限制在1MB以内</span>';
                 return;
             }
             try {
@@ -2690,9 +2691,9 @@
                 if (msg.includes('Unexpected token')) {
                     hint = ' → 检查是否有多余的逗号、缺少引号或括号不匹配';
                 } else if (msg.includes('Unexpected end')) {
-                    hint = ' → JSON不完整，检查是否缺少闭合的括号或引号';
+                    hint = ' → JSON不完整,检查是否缺少闭合的括号或引号';
                 } else if (msg.includes('Expecting')) {
-                    hint = ' → 格式不符合JSON规范，键名需要双引号';
+                    hint = ' → 格式不符合JSON规范,键名需要双引号';
                 }
                 document.getElementById('jsonResult').innerHTML = `<span style="color: #ff6b6b;">❌ JSON格式错误: ${msg}${hint}</span>`;
             }
@@ -2705,7 +2706,7 @@
                 return;
             }
             if (input.length > 1000000) {
-                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大，请限制在1MB以内</span>';
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #ff6b6b;">❌ 文件过大,请限制在1MB以内</span>';
                 return;
             }
             try {
@@ -2717,9 +2718,9 @@
                 if (msg.includes('Unexpected token')) {
                     hint = ' → 检查是否有多余的逗号、缺少引号或括号不匹配';
                 } else if (msg.includes('Unexpected end')) {
-                    hint = ' → JSON不完整，检查是否缺少闭合的括号或引号';
+                    hint = ' → JSON不完整,检查是否缺少闭合的括号或引号';
                 } else if (msg.includes('Expecting')) {
-                    hint = ' → 格式不符合JSON规范，键名需要双引号';
+                    hint = ' → 格式不符合JSON规范,键名需要双引号';
                 }
                 document.getElementById('jsonResult').innerHTML = `<span style="color: #ff6b6b;">❌ JSON格式错误: ${msg}${hint}</span>`;
             }
@@ -2733,16 +2734,16 @@
             }
             try {
                 JSON.parse(input);
-                document.getElementById('jsonResult').innerHTML = '<span style="color: #00ff88;">✅ JSON格式有效！</span>';
+                document.getElementById('jsonResult').innerHTML = '<span style="color: #00ff88;">✅ JSON格式有效!</span>';
             } catch (e) {
                 const msg = e.message;
                 let hint = '';
                 if (msg.includes('Unexpected token')) {
                     hint = ' → 检查是否有多余的逗号、缺少引号或括号不匹配';
                 } else if (msg.includes('Unexpected end')) {
-                    hint = ' → JSON不完整，检查是否缺少闭合的括号或引号';
+                    hint = ' → JSON不完整,检查是否缺少闭合的括号或引号';
                 } else if (msg.includes('Expecting')) {
-                    hint = ' → 格式不符合JSON规范，键名需要双引号';
+                    hint = ' → 格式不符合JSON规范,键名需要双引号';
                 }
                 document.getElementById('jsonResult').innerHTML = `<span style="color: #ff6b6b;">❌ JSON格式错误: ${msg}${hint}</span>`;
             }
@@ -2762,7 +2763,7 @@
                 const regex = new RegExp(pattern, flags);
                 const matches = text.match(regex);
                 if (matches) {
-                    let result = `<span style="color: #00ff88;">找到 ${matches.length} 个匹配：</span>\n`;
+                    let result = `<span style="color: #00ff88;">找到 ${matches.length} 个匹配:</span>\n`;
                     matches.forEach((m, i) => result += `\n[${i+1}] ${m}`);
                     document.getElementById('regexResult').innerHTML = result;
                 } else {
@@ -2774,11 +2775,11 @@
                 if (msg.includes('Unterminated')) {
                     hint = ' → 检查是否缺少闭合的括号、方括号或大括号';
                 } else if (msg.includes('Invalid quantifier')) {
-                    hint = ' → 量词格式错误，正确格式如 a* a+ a? a{2} a{2,5}';
+                    hint = ' → 量词格式错误,正确格式如 a* a+ a? a{2} a{2,5}';
                 } else if (msg.includes('Nothing to repeat')) {
-                    hint = ' → 量词前需要有字符，如 \\d+ 而不是 +';
+                    hint = ' → 量词前需要有字符,如 \\d+ 而不是 +';
                 } else if (msg.includes('Invalid escape')) {
-                    hint = ' → 转义字符错误，常用：\\d \\w \\s \\. \\* \\?';
+                    hint = ' → 转义字符错误,常用:\\d \\w \\s \\. \\* \\?';
                 }
                 document.getElementById('regexResult').innerHTML = `<span style="color: #ff6b6b;">❌ 正则表达式错误: ${msg}${hint}</span>`;
             }
@@ -2789,10 +2790,10 @@
             let hex = document.getElementById('hexInput').value.trim();
             if (!hex) return;
             if (!hex.startsWith('#')) hex = '#' + hex;
-            // 验证HEX格式：#RGB 或 #RRGGBB
+            // 验证HEX格式:#RGB 或 #RRGGBB
             if (!/^#([A-Fa-f0-9]{3}|[A-Fa-f0-9]{6})$/.test(hex)) {
                 document.getElementById('rgbInput').value = '格式错误';
-                document.getElementById('hslInput').value = '请输入有效的HEX颜色（如 #FF5733 或 #F53）';
+                document.getElementById('hslInput').value = '请输入有效的HEX颜色(如 #FF5733 或 #F53)';
                 return;
             }
             // 扩展3位HEX为6位
@@ -2851,7 +2852,7 @@
             const file = input.files[0];
             if (!file) return;
             if (file.size > 5 * 1024 * 1024) {
-                alert('文件过大，请限制在5MB以内');
+                alert('文件过大,请限制在5MB以内');
                 input.value = '';
                 return;
             }
@@ -2878,13 +2879,13 @@
                 if (!input) {
                     hint = '请先输入要解码的内容';
                 } else if (!/^[A-Za-z0-9+/=]+$/.test(input.replace(/\s/g, ''))) {
-                    hint = '包含无效字符（Base64只允许A-Z、a-z、0-9、+、/、=）';
+                    hint = '包含无效字符(Base64只允许A-Z、a-z、0-9、+、/、=)';
                 } else if (input.length % 4 !== 0) {
-                    hint = '长度不正确（Base64字符串长度必须是4的倍数）';
+                    hint = '长度不正确(Base64字符串长度必须是4的倍数)';
                 } else {
                     hint = '请检查输入是否为有效的Base64编码';
                 }
-                document.getElementById('base64Result').innerHTML = `<span style="color: #ff6b6b;">❌ 解码失败：${hint}</span>`;
+                document.getElementById('base64Result').innerHTML = `<span style="color: #ff6b6b;">❌ 解码失败:${hint}</span>`;
         }
 
         // URL Encode
@@ -2903,11 +2904,11 @@
                 if (!input) {
                     hint = '请先输入要解码的内容';
                 } else if (input.includes('%') && !/%[0-9A-Fa-f]{2}/.test(input)) {
-                    hint = '百分号后需要跟两位十六进制数（如 %20 表示空格）';
+                    hint = '百分号后需要跟两位十六进制数(如 %20 表示空格)';
                 } else {
                     hint = '请检查是否包含不完整的编码序列';
                 }
-                document.getElementById('urlResult').innerHTML = `<span style="color: #ff6b6b;">❌ 解码失败：${hint}</span>`;
+                document.getElementById('urlResult').innerHTML = `<span style="color: #ff6b6b;">❌ 解码失败:${hint}</span>`;
         }
 
         // Timestamp
@@ -3005,7 +3006,7 @@
                 if (canvas) {
                     link.href = canvas.toDataURL('image/png');
                 } else if (img) {
-                    // 如果是 img 标签，先转成 canvas
+                    // 如果是 img 标签,先转成 canvas
                     const tempCanvas = document.createElement('canvas');
                     tempCanvas.width = img.naturalWidth || 200;
                     tempCanvas.height = img.naturalHeight || 200;
@@ -3022,7 +3023,7 @@
             const file = input.files[0];
             if (!file) return;
             if (file.size > 10 * 1024 * 1024) {
-                alert('图片过大，请限制在10MB以内');
+                alert('图片过大,请限制在10MB以内');
                 input.value = '';
                 return;
             }
@@ -3121,9 +3122,9 @@
         // Word Counter
         function countWords() {
             const text = document.getElementById('wordCountInput').value;
-            // 字符数（包括空格和换行）
+            // 字符数(包括空格和换行)
             document.getElementById('charCount').textContent = text.length;
-            // 单词数（中英文分开统计）
+            // 单词数(中英文分开统计)
             let wordCount = 0;
             if (text.trim()) {
                 const chinese = text.match(/[\u4e00-\u9fa5]/g) || [];
@@ -3131,9 +3132,9 @@
                 wordCount = chinese.length + english.length;
             }
             document.getElementById('wordCountNum').textContent = wordCount;
-            // 行数：统计非空行的数量（处理各种换行符格式）
+            // 行数:统计非空行的数量(处理各种换行符格式)
             let lines = text.split(/\r\n|\r|\n/).filter(line => line.trim() !== '').length;
-            // 如果有内容但没有非空行（比如全是空行），至少算1行
+            // 如果有内容但没有非空行(比如全是空行),至少算1行
             if (text.trim() && lines === 0) lines = 1;
             document.getElementById('lineCount').textContent = lines;
             // 字节数
@@ -3224,7 +3225,7 @@
 
         function calcEquals() {
             try {
-                // 使用 Function 代替 eval，更安全
+                // 使用 Function 代替 eval,更安全
                 // 只允许数学运算字符
                 const sanitized = calcValue.replace(/[^0-9+\-*/.%()^Math.sincostanlogsqrtabspiex]/g, '');
                 const calcFunc = new Function('return ' + sanitized);
@@ -3288,7 +3289,7 @@
                     document.getElementById('calcDisplay').value = 'Error';
                     calcValue = '';
                 } else {
-                    // 格式化结果，去除多余小数点
+                    // 格式化结果,去除多余小数点
                     calcValue = parseFloat(result.toPrecision(12)).toString();
                     document.getElementById('calcDisplay').value = calcValue;
                 }
@@ -3411,13 +3412,13 @@
             try {
                 new URL(url);
             } catch (e) {
-                document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入有效的网址（如：example.com）</span>';
+                document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 请输入有效的网址(如:example.com)</span>';
                 document.getElementById('screenshotError').style.display = 'block';
                 return;
             }
 
             // 显示加载中
-            document.getElementById('screenshotError').innerHTML = '<span style="color: #00d9ff;">⏳ 正在截图，请稍候...</span>';
+            document.getElementById('screenshotError').innerHTML = '<span style="color: #00d9ff;">⏳ 正在截图,请稍候...</span>';
             document.getElementById('screenshotError').style.display = 'block';
             document.getElementById('screenshotPreview').style.display = 'none';
 
@@ -3433,14 +3434,14 @@
 
             function tryNextApi() {
                 if (currentApiIndex >= apis.length) {
-                    document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 所有截图服务均失败，请稍后重试</span>';
+                    document.getElementById('screenshotError').innerHTML = '<span style="color: #ff6b6b;">❌ 所有截图服务均失败,请稍后重试</span>';
                     return;
                 }
 
                 const apiUrl = apis[currentApiIndex];
                 screenshotImg.src = apiUrl;
                 screenshotImg.onload = function() {
-                    // 检查是否是有效图片（有些 API 失败会返回错误图片）
+                    // 检查是否是有效图片(有些 API 失败会返回错误图片)
                     document.getElementById('screenshotPreview').style.display = 'block';
                     document.getElementById('screenshotError').style.display = 'none';
                 };
@@ -3482,8 +3483,8 @@
                 // 释放内存
                 setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
             } catch (e) {
-                // 跨域失败时，提示用户右键另存
-                alert('浏览器安全限制，请右键点击图片选择"另存为..."');
+                // 跨域失败时,提示用户右键另存
+                alert('浏览器安全限制,请右键点击图片选择"另存为..."');
             } finally {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -3592,7 +3593,7 @@
             copyToClipboard(result, event.target);
         }
 
-        // 网速测试（真实测速）
+        // 网速测试(真实测速)
         let speedTestInterval;
         let speedTestAbortController = null;
         
@@ -3659,20 +3660,20 @@
                 const duration = (endTime - startTime) / 1000; // 秒
                 downloadSpeed = (receivedLength * 8 / 1000000) / duration; // Mbps
                 
-                // 上传速度估算（通常为下载的 1/3 到 1/2）
+                // 上传速度估算(通常为下载的 1/3 到 1/2)
                 const uploadSpeed = downloadSpeed * 0.35;
                 
                 finishSpeedTest(downloadSpeed, uploadSpeed, pingMs);
                 
             } catch (error) {
                 console.error('Speed test error:', error);
-                // 如果 Cloudflare 失败，使用备用方案
+                // 如果 Cloudflare 失败,使用备用方案
                 await fallbackSpeedTest();
             }
         }
         
         async function fallbackSpeedTest() {
-            // 备用测速方案：下载图片
+            // 备用测速方案:下载图片
             const testImg = 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/US_100_1974.jpg/640px-US_100_1974.jpg?' + Date.now();
             const startTime = performance.now();
             
@@ -3686,7 +3687,7 @@
             } catch (e) {
                 document.getElementById('speedBtn').textContent = '🚀 重新测试';
                 document.getElementById('speedBtn').disabled = false;
-                alert('测速失败，请检查网络连接');
+                alert('测速失败,请检查网络连接');
             }
         }
 
@@ -3747,7 +3748,7 @@
             if (typeCount >= 3) score += 10;
             if (typeCount >= 4) score += 5;
             
-            // 惩罚：纯数字、纯字母、常见模式
+            // 惩罚:纯数字、纯字母、常见模式
             if (/^\d+$/.test(pwd)) score = Math.min(score, 20);
             if (/^[a-zA-Z]+$/.test(pwd)) score = Math.min(score, 25);
             if (/^(123456|password|qwerty|abc123|111111|admin|letmein|welcome|monkey|dragon)/i.test(pwd)) score = Math.min(score, 10);
@@ -3774,7 +3775,7 @@
             if (charSpace === 0) charSpace = 1;
             
             const combinations = Math.pow(charSpace, length);
-            // 假设攻击速度：100亿次/秒（现代GPU）
+            // 假设攻击速度:100亿次/秒(现代GPU)
             const attacksPerSecond = 10e9;
             const secondsToCrack = combinations / attacksPerSecond;
             
@@ -3820,20 +3821,20 @@
             
             // 改进建议
             const suggestions = [];
-            if (length < 8) suggestions.push('💡 密码至少需要8位，建议12位以上');
+            if (length < 8) suggestions.push('💡 密码至少需要8位,建议12位以上');
             if (!hasLower) suggestions.push('💡 添加小写字母 (a-z)');
             if (!hasUpper) suggestions.push('💡 添加大写字母 (A-Z)');
             if (!hasDigit) suggestions.push('💡 添加数字 (0-9)');
             if (!hasSpecial) suggestions.push('💡 添加特殊符号 (!@#$%...)');
             if (/(.)\1{2,}/.test(pwd)) suggestions.push('💡 避免连续重复字符 (如 aaa, 111)');
-            if (/^(123456|password|qwerty)/i.test(pwd)) suggestions.push('⚠️ 这是常见弱密码，极易被破解');
+            if (/^(123456|password|qwerty)/i.test(pwd)) suggestions.push('⚠️ 这是常见弱密码,极易被破解');
             
             const sugEl = document.getElementById('pwdSuggestions');
             if (suggestions.length > 0) {
                 sugEl.innerHTML = `<div style="color: #8892b0; margin-bottom: 8px;">改进建议</div>` +
                     suggestions.map(s => `<div style="padding: 6px 0; color: #e0e0e0; font-size: 0.85rem;">${s}</div>`).join('');
             } else {
-                sugEl.innerHTML = '<div style="padding: 8px; background: rgba(0,255,136,0.1); border-radius: 8px; color: #00ff88;">🎉 密码安全性很高！</div>';
+                sugEl.innerHTML = '<div style="padding: 8px; background: rgba(0,255,136,0.1); border-radius: 8px; color: #00ff88;">🎉 密码安全性很高!</div>';
             }
         }
 
@@ -3856,7 +3857,7 @@
             let result = input;
             let stats = [];
             
-            // 手机号：1开头11位数字
+            // 手机号:1开头11位数字
             const phoneRegex = /1[3-9]\d{9}/g;
             const phoneMatches = result.match(phoneRegex);
             if (phoneMatches) {
@@ -3864,7 +3865,7 @@
                 stats.push({ type: '📱 手机号', count: phoneMatches.length, example: phoneMatches[0].substring(0, 3) + '****' + phoneMatches[0].substring(7) });
             }
             
-            // 身份证号：15或18位
+            // 身份证号:15或18位
             const idCardRegex = /[1-9]\d{5}(19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]/g;
             const idCardMatches = result.match(idCardRegex);
             if (idCardMatches) {
@@ -3883,7 +3884,7 @@
                 stats.push({ type: '📧 邮箱', count: emailMatches.length, example: emailMatches[0].substring(0, 2) + '***@' + emailMatches[0].split('@')[1] });
             }
             
-            // 银行卡号：16-19位连续数字
+            // 银行卡号:16-19位连续数字
             const bankCardRegex = /6[02589]\d{14,18}/g;
             const bankMatches = result.match(bankCardRegex);
             if (bankMatches) {
@@ -3902,8 +3903,8 @@
                 stats.push({ type: '🌐 IP地址', count: ipMatches.length, example: ipMatches[0].split('.')[0] + '.' + ipMatches[0].split('.')[1] + '.*.*' });
             }
             
-            // 中文姓名（2-4个汉字，前后有分隔符）
-            const nameRegex = /(?<=[，,、\s：:])[\u4e00-\u9fa5]{2,4}(?=[，,、\s：:是])/g;
+            // 中文姓名(2-4个汉字,前后有分隔符)
+            const nameRegex = /(?<=[,,、\s::])[\u4e00-\u9fa5]{2,4}(?=[,,、\s::是])/g;
             const nameMatches = result.match(nameRegex);
             if (nameMatches && nameMatches.length <= 5) { // 避免误伤太多
                 result = result.replace(nameRegex, m => m[0] + '**');
@@ -3925,7 +3926,7 @@
                 ).join('');
             } else {
                 statsEl.style.display = 'block';
-                detailEl.innerHTML = '<div style="color: #ffd700;">未识别到敏感信息，文本无需脱敏</div>';
+                detailEl.innerHTML = '<div style="color: #ffd700;">未识别到敏感信息,文本无需脱敏</div>';
             }
         }
 
@@ -4027,7 +4028,7 @@
             const container = document.getElementById('gradientColors');
             const addBtn = container.querySelector('button');
             
-            // 清除现有颜色输入（保留添加按钮）
+            // 清除现有颜色输入(保留添加按钮)
             const existingInputs = container.querySelectorAll('input[type="color"]');
             existingInputs.forEach(el => el.remove());
             
@@ -4058,8 +4059,10 @@
         renderTools();
         updateQuickAccess();
 
-        // 动态设置工具数量（以后加工具自动更新）
+        // 动态设置工具数量(以后加工具自动更新)
         document.getElementById('toolCount').textContent = tools.length;
-    </script>
+}}});
+</script>
 </body>
 </html>
+
